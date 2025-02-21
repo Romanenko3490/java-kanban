@@ -1,11 +1,15 @@
+package controllers;
+
+import models.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class TaskManager {
-    static private final Map<Integer, Epic> epicStore = new HashMap();
-    static private final Map<Integer, Task> taskStore = new HashMap<>();
-    static private final Map<Integer, Epic.Subtask> subtaskStore = new HashMap<>();
+    private final Map<Integer, Epic> epicStore = new HashMap();
+    private final Map<Integer, Task> taskStore = new HashMap<>();
+    private final Map<Integer, Subtask> subtaskStore = new HashMap<>();
 
     //Методы для каждого из типа задач(Задача/Эпик/Подзадача):
     // a. Получение списка всех задач.
@@ -18,7 +22,7 @@ public class TaskManager {
         return taskStore;
     }
 
-    public Map<Integer, Epic.Subtask> getSubtaskStore() {
+    public Map<Integer, Subtask> getSubtaskStore() {
         return subtaskStore;
     }
 
@@ -47,49 +51,55 @@ public class TaskManager {
         return taskStore.get(id);
     }
 
-    Epic.Subtask getSubtaskByID(int id) {
+    Subtask getSubtaskByID(int id) {
         return subtaskStore.get(id);
     }
 
     // d. Создание. Сам объект должен передаваться в качестве параметра.
-    static void addEpicToEpicStore(Epic epic) {
-        epicStore.put(epic.getId(), epic);
+    public void addEpicToEpicStore(Epic epic) {
+       this.epicStore.put(epic.getId(), epic);
     }
 
-    static void addTaskToTaskStore(Task task) {
-        taskStore.put(task.getId(), task);
+    public void addTaskToTaskStore(Task task) {
+        this.taskStore.put(task.getId(), task);
     }
 
-    static void addSubtaskToSubtaskStore(Epic.Subtask subtask) {
-        subtaskStore.put(subtask.getId(), subtask);
+    public void addSubtaskToSubtaskStore(Subtask subtask) {
+        this.subtaskStore.put(subtask.getId(), subtask);
+    }
+
+    public void addSubtaskToSubtaskStore(List<Subtask> subtaskList) {
+        for (Subtask subtask: subtaskList) {
+            subtaskStore.put(subtask.getId(), subtask);
+        }
     }
     // e. Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
     void updateEpic(int id, String name, String description) {
         Epic epicToChange = epicStore.get(id);
         epicToChange.setName(name);
         epicToChange.setDescription(description);
-        epicToChange.updateStatus();
+        epicToChange.getStatus();
 
     }
 
-    void updateTask(int id, String name, String description, String status) {
+    void updateTask(int id, String name, String description, Status status) {
         Task taskToChange = taskStore.get(id);
         taskToChange.setName(name);
         taskToChange.setDescription(description);
         taskToChange.setStatus(status);
     }
 
-    void updateSubtask(int id, String name, String description, String status) {
-        Epic.Subtask subtaskToChange = subtaskStore.get(id);
+    void updateSubtask(int id, String name, String description, Status status) {
+        Subtask subtaskToChange = subtaskStore.get(id);
         subtaskToChange.setName(name);
         subtaskToChange.setDescription(description);
         subtaskToChange.setStatus(status);
     }
 
     // f. Удаление по идентификатору.
-    void deleteEpicByID(int id) {
+    public void deleteEpicByID(int id) {
         Epic epicToDelete = epicStore.get(id);
-        for (Epic.Subtask subtask : subtaskStore.values()) {
+        for (Subtask subtask : subtaskStore.values()) {
             if (subtask.getEpicID() == epicToDelete.getId()){
                 subtaskStore.remove(subtask);
             }
@@ -97,23 +107,22 @@ public class TaskManager {
         epicStore.remove(id);
     }
 
-    void deleteTaskByID(int id) {
+    public void deleteTaskByID(int id) {
         taskStore.remove(id);
     }
 
-    void deleteSubtaskByID(int id) {
-        Epic.Subtask subtaskToDelete = subtaskStore.get(id);
+    public void deleteSubtaskByID(int id) {
+        Subtask subtaskToDelete = subtaskStore.get(id);
         Epic epicToChange = epicStore.get(subtaskToDelete.getEpicID());
         epicToChange.deleteSubtask(id);
         subtaskStore.remove(id);
     }
 
     //Получение списка всех подзадач определённого эпика.
-    List<Epic.Subtask> getSubtasksFromEpic(int epicID) {
+    public List<Subtask> getSubtasksFromEpic(int epicID) {
         Epic epic = epicStore.get(epicID);
         return epic.getSubtaskList();
     }
-//утилитарыне удалить
 
 
 }

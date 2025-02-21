@@ -1,3 +1,5 @@
+package models;
+
 import java.util.Objects;
 
 /*
@@ -5,17 +7,19 @@ import java.util.Objects;
 НУ и как по моему мнению, повысить гибкость классов Epic и Task.
  */
 
-abstract class AbstractTask {
+public abstract class AbstractTask {
     private static int idCounter = 1;
     private int id;
     private String name;
     private String description;
+    protected Status status;
 
     public AbstractTask(String name, String description) {
         this.name = name;
         this.description = description;
         this.id = idCounter;
         idCounter++;
+        this.status = Status.NEW;
     }
 
     // Гетеры
@@ -31,7 +35,9 @@ abstract class AbstractTask {
         return description;
     }
 
-
+    public Status getStatus() {
+        return status;
+    }
     //сеттеры
     public void setName(String name) {
         this.name = name;
@@ -39,6 +45,10 @@ abstract class AbstractTask {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
 
