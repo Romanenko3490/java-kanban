@@ -1,10 +1,7 @@
 package controllers;
 
 import models.*;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TaskManager {
     private final Map<Integer, Epic> epicStore = new HashMap();
@@ -14,21 +11,22 @@ public class TaskManager {
     //Методы для каждого из типа задач(Задача/Эпик/Подзадача):
     // a. Получение списка всех задач.
 
-    public Map<Integer, Epic> getEpicStore() {
-        return epicStore;
+    public ArrayList<Epic> getEpicStore() {
+        return new ArrayList<>(epicStore.values());
     }
 
-    public Map<Integer, Task> getTaskStore() {
-        return taskStore;
+    public ArrayList<Task> getTaskStore() {
+        return new ArrayList<>(taskStore.values());
     }
 
-    public Map<Integer, Subtask> getSubtaskStore() {
-        return subtaskStore;
+    public ArrayList<Subtask> getSubtaskStore() {
+        return new ArrayList<>(subtaskStore.values());
     }
 
     // b. Удаление всех задач.
     public void clearEpicStore() {
         epicStore.clear();
+        subtaskStore.clear();
     }
 
     public void clearTaskStore() {
@@ -62,6 +60,27 @@ public class TaskManager {
 
     public void addTaskToTaskStore(Task task) {
         this.taskStore.put(task.getId(), task);
+    }
+
+    public int addNewTask(Task task) {
+        final int id = AbstractTask.getIdCounter() + 1;
+        task.setId(id);
+        taskStore.put(id, task);
+        return id;
+    }
+
+    public int addNewSubtask(Subtask subtask) {
+        final int id = AbstractTask.getIdCounter() + 1;
+        subtask.setId(id);
+        subtaskStore.put(id, subtask);
+        return id;
+    }
+
+    public int addNewEpic(Epic epic) {
+        final int id = AbstractTask.getIdCounter() + 1;
+        epic.setId(id);
+        epicStore.put(id, epic);
+        return id;
     }
 
     public void addSubtaskToSubtaskStore(Subtask subtask) {

@@ -8,7 +8,7 @@ import java.util.Objects;
  */
 
 public abstract class AbstractTask {
-    private static int idCounter = 1;
+    static int idCounter = 1;
     private int id;
     private String name;
     private String description;
@@ -38,6 +38,10 @@ public abstract class AbstractTask {
     public Status getStatus() {
         return status;
     }
+    public static int getIdCounter() {
+        return idCounter;
+    }
+
     //сеттеры
     public void setName(String name) {
         this.name = name;
@@ -49,6 +53,10 @@ public abstract class AbstractTask {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
 

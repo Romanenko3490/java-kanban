@@ -10,12 +10,7 @@ public class Epic extends AbstractTask {
         super(name, description);
     }
 
-//Действительно, Ваш код получился короче и логичнее, но у меня в некоторых тестах получалось, что при изменении
-    // статуса подзадачи менялся и статус эпика. не смог разобраться как избежать учет переменной
-// количества выполненых подзадач так, оставил свой вариант.
     private void setStatus() {
-        boolean isNew = true;
-        boolean isCompleted = false;
         int newCount = 0;
         int completedCount = 0;
         for (Subtask subtask : subtaskList) {
@@ -25,19 +20,14 @@ public class Epic extends AbstractTask {
                 completedCount++;
             }
         }
-        if (newCount != subtaskList.size())
-            isNew = false;
-        if (completedCount == subtaskList.size())
-            isCompleted = true;
-
-        if (subtaskList.isEmpty() || isNew) {
+        if (subtaskList.isEmpty() || newCount == subtaskList.size()) {
             this.status = Status.NEW;
-        } else if (isCompleted) {
+        } else if (completedCount == subtaskList.size()) {
             this.status = Status.DONE;
         } else
             this.status = Status.IN_PROGRESS;
+    }
 
-}
 
     public Status getStatus() {
         setStatus();

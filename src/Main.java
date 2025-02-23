@@ -48,13 +48,5 @@ public class Main {
         System.out.println(taskManager.getEpicStore() + "\n");
         System.out.println("_____________________________________________" + "\n");
 
-//        Epic epic = new Epic("epic", "description");
-//        epic.createSubtask("sub1", "des1", Status.IN_PROGRESS);
-//        epic.createSubtask("sub2", "des 2");
-//        epic.createSubtask("sub3", "des 3");
-//        System.out.println(epic);
-//        System.out.println();
-//        epic.getSubtaskList().get(0).setStatus(Status.DONE);
-//        System.out.println(epic);
     }
 }
