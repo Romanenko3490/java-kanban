@@ -84,6 +84,7 @@ public class TaskManager {
     }
 
     public void addSubtaskToSubtaskStore(Subtask subtask) {
+
         this.subtaskStore.put(subtask.getId(), subtask);
     }
 
@@ -127,6 +128,7 @@ public class TaskManager {
     }
 
     public void deleteTaskByID(int id) {
+
         taskStore.remove(id);
     }
 

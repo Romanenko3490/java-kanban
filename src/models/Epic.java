@@ -31,9 +31,6 @@ public class Epic extends AbstractTask {
 
     public Status getStatus() {
         setStatus();
-        //Оставил реализацию метода, преддложеного вами, во время теста отображается не верный статус эпика.
-        // Вдруг решите посмотреть =). Также в Main закоментил условия, при которых тестировал. Спасибо
-        //epicCheckStatus(this);
         return status;
     }
 
@@ -77,26 +74,5 @@ public class Epic extends AbstractTask {
                 "', status='" + getStatus() +"', contains subtasks:\n" + getSubtaskList();
     }
 
-
-    // Проверил предложеный вами алгоритм, он логичен и короток, но возникает ситуация, когда подзадача имеет статус
-    // DONE, а другие NEW, тогда статус эпика будет DONE, что не верно. Думал думал, как доработать, чтоб было коротко,
-    // но не приходит на ум алгоритм без использования каунтера выполненых подзадач =(
-    public void epicCheckStatus(Epic epic) {
-        int newStat = 0;
-        for (Subtask subtask : epic.getSubtaskList()) {
-            if (subtask.getStatus() == Status.IN_PROGRESS) {
-                setStatus(Status.IN_PROGRESS);
-                return;
-            }
-            if (subtask.getStatus() == Status.NEW) {
-                newStat++;
-            }
-        }
-        if (newStat == subtaskList.size()) {
-            setStatus(Status.NEW);
-        } else {
-            setStatus(Status.DONE);
-        }
-    }
 }
 

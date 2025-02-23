@@ -2,13 +2,8 @@ package models;
 
 import java.util.Objects;
 
-/*
-Принял решение создать абстрактный класс, чтоб решить проблему разной реализации метода setStatus.
-НУ и как по моему мнению, повысить гибкость классов Epic и Task.
- */
-
 public abstract class AbstractTask {
-    static int idCounter = 1;
+    private static int idCounter = 1;
     private int id;
     private String name;
     private String description;
