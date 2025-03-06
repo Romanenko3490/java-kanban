@@ -37,6 +37,11 @@ public abstract class AbstractTask {
         return idCounter;
     }
 
+    //Доабвил метод для более удобного тестирования
+    public static void resetIdCounter() {
+        idCounter = 1;
+    }
+
     //сеттеры
     public void setName(String name) {
         this.name = name;

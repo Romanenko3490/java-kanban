@@ -34,7 +34,7 @@ public class Epic extends AbstractTask {
         return status;
     }
 
-    private void addSubtask(Subtask subtask) {
+    public void addSubtask(Subtask subtask) {
         subtaskList.add(subtask);
         subtask.setEpicID(getId());
     }
@@ -60,11 +60,13 @@ public class Epic extends AbstractTask {
     }
 
     public void deleteSubtask(int id) {
+        Subtask subtaskToDelete = null;
         for (Subtask subtask : subtaskList) {
             if (subtask.getId() == id) {
-                subtaskList.remove(subtask);
+                subtaskToDelete = subtask;
             }
         }
+        subtaskList.remove(subtaskToDelete);
     }
 
 
@@ -73,6 +75,7 @@ public class Epic extends AbstractTask {
         return "Epic{ ID='" + getId() + "', name='" + getName() + "', description='" + getDescription() +
                 "', status='" + getStatus() +"', contains subtasks:\n" + getSubtaskList();
     }
+
 
 }
 

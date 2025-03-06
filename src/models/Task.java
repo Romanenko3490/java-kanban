@@ -11,10 +11,6 @@ public class Task extends AbstractTask {
         this.status = status;
     }
 
-    public void setStatus(Status newStatus) {
-        this.status = newStatus;
-    }
-
     @Override
     public String toString() {
         return "Task{ ID='" + getId() + "' name='" + getName() + "', description='" + getDescription() + "' " +
