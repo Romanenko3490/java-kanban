@@ -1,10 +1,7 @@
 import controllers.InMemoryHistoryManager;
 import controllers.InMemoryTaskManager;
 import models.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +25,7 @@ class InMemoryTaskManagerTest {
         inMemoryTaskManager.addNewTask(task);
         inMemoryTaskManager.addNewEpic(epic);
     }
+
 
     @AfterEach
     public void resetIdCounter() {

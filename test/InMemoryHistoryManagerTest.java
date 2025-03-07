@@ -1,5 +1,3 @@
-import controllers.HistoryManager;
-import controllers.InMemoryHistoryManager;
 import controllers.InMemoryTaskManager;
 import models.AbstractTask;
 import models.Epic;
@@ -32,34 +30,33 @@ class InMemoryHistoryManagerTest {
     @AfterEach
     public void resetIdCounter() {
         AbstractTask.resetIdCounter();
-        InMemoryHistoryManager.clearHistory();
-
     }
 
     @Test
     public void methodGeTaskShelPutObjectIHistoryList() {
-        int historyListSize = InMemoryHistoryManager.getHistory().size();
+        int historyListSize = inMemoryTaskManager.getHistoryManager().getHistory().size();
         assertEquals(0, historyListSize);
 
         inMemoryTaskManager.getEpicByID(1);
         inMemoryTaskManager.getTaskByID(2);
         inMemoryTaskManager.getSubtaskByID(3);
 
-        historyListSize = InMemoryHistoryManager.getHistory().size();
+        historyListSize = inMemoryTaskManager.getHistoryManager().getHistory().size();
         assertEquals(3, historyListSize);
     }
 
     @Test
     public void capacityOfHistoryListShellNotExceed10Objects() {
-        int historyListSize = InMemoryHistoryManager.getHistory().size();
+        int historyListSize = inMemoryTaskManager.getHistoryManager().getHistory().size();
         assertEquals(0, historyListSize);
 
         for (int i = 0; i < 20; i++) {
             Task task = new Task("task" + i, "des" + i);
-            inMemoryTaskManager.getTaskByID(3 + i);
+            inMemoryTaskManager.addNewTask(task);
+            inMemoryTaskManager.getTaskByID(4 + i);
         }
 
-        historyListSize = InMemoryHistoryManager.getHistory().size();
+        historyListSize = inMemoryTaskManager.getHistoryManager().getHistory().size();
         assertEquals(10, historyListSize);
     }
 

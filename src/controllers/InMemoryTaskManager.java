@@ -1,13 +1,14 @@
 package controllers;
 
+import Utility.Managers;
 import models.*;
 import java.util.*;
 
 public class InMemoryTaskManager <T extends AbstractTask> implements TaskManager {
+    private final HistoryManager historyManager = Managers.getDefaultHistory(); // я так понимаю это паттерн проектирования Декоратор? =)
     private final Map<Integer, Epic> epicStore = new HashMap();
     private final Map<Integer, Task> taskStore = new HashMap<>();
     private final Map<Integer, Subtask> subtaskStore = new HashMap<>();
-    //Хранение 10 последних просмотренных задач
 
     //Методы для каждого из типа задач(Задача/Эпик/Подзадача):
     // a. Получение списка всех задач.
@@ -50,19 +51,19 @@ public class InMemoryTaskManager <T extends AbstractTask> implements TaskManager
     // c. Получение по идентификатору.
     @Override
     public Epic getEpicByID(int id) {
-        InMemoryHistoryManager.addToHistory(epicStore.get(id));
+        getHistoryManager().addToHistory(epicStore.get(id));
         return epicStore.get(id);
     }
 
     @Override
     public Task getTaskByID(int id) {
-        InMemoryHistoryManager.addToHistory(taskStore.get(id));
+        getHistoryManager().addToHistory(taskStore.get(id));
         return taskStore.get(id);
     }
 
     @Override
     public Subtask getSubtaskByID(int id) {
-        InMemoryHistoryManager.addToHistory(subtaskStore.get(id));
+        getHistoryManager().addToHistory(subtaskStore.get(id));
         return subtaskStore.get(id);
     }
 
@@ -154,6 +155,11 @@ public class InMemoryTaskManager <T extends AbstractTask> implements TaskManager
     public List<Subtask> getSubtasksFromEpic(int epicID) {
         Epic epic = epicStore.get(epicID);
         return epic.getSubtaskList();
+    }
+
+    //добавил метод, чтоб возвращать свой хисторименеджер длятестов
+    public InMemoryHistoryManager getHistoryManager() {
+        return (InMemoryHistoryManager) historyManager;
     }
 
 }

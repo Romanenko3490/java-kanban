@@ -2,6 +2,7 @@ import models.AbstractTask;
 import models.Status;
 import models.Task;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,6 +10,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class TaskTest {
     Task task1 = new Task("Task1", "Description1");
     Task task2 = new Task("Task2", "Description2", Status.DONE);
+
+    @AfterEach
+    public void resetIdCounter() {
+        AbstractTask.resetIdCounter();
+    }
 
     @Test
     public void shellNotBeNull() {

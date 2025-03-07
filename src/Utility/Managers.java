@@ -5,17 +5,17 @@ import controllers.InMemoryHistoryManager;
 import controllers.InMemoryTaskManager;
 import controllers.TaskManager;
 
-public class Managers <T extends TaskManager> {
+public class Managers {
 
-    //Managers должен сам подбирать нужную реализацию TaskManager и возвращать объект правильного типа.
-    // Со временем будем много реализаций интерфейса TaskManager, но так как она пока одна, реализовал метод так
+    //Да, наверное вы правы, обобщение тут ни к чему, если будет множество разных менеджеров.
 
+    //Возможно наворотил бутерброд какой-то тут =)
     public TaskManager getDefault() {
         TaskManager manager = new InMemoryTaskManager<>();
         return manager;
     }
 
-    public HistoryManager getDefaultHistory() {
+    public static HistoryManager getDefaultHistory() {
         HistoryManager historyManager = new InMemoryHistoryManager();
         return historyManager;
     }

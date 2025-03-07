@@ -2,27 +2,31 @@ package controllers;
 
 import models.AbstractTask;
 import java.util.ArrayList;
+import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    public static ArrayList<AbstractTask> historyList = new ArrayList<>(10);
+    private ArrayList<AbstractTask> historyList = new ArrayList<>(10);
 
     //Получение истории просмотров, получение последних 10 просмотренных задач
-    public static ArrayList<AbstractTask> getHistory() {
-        return historyList;
+    @Override
+    public ArrayList<AbstractTask> getHistory() {
+        ArrayList<AbstractTask> listForReturn = new ArrayList<>(historyList);
+        return listForReturn;
     }
 
     //Логика добавления задачи в список истории просмотра
-    public static void addToHistory(AbstractTask task) {
-        if (historyList.size() < 10) {
-            historyList.add(task);
-        } else if (historyList.size() == 10) {
+    //спасибо за подсказку!
+    @Override
+    public void addToHistory(AbstractTask task) {
+        if (task == null)
+            return;
+        historyList.add(task);
+        if (historyList.size() > 10)
             historyList.removeFirst();
-            historyList.add(task);
-        }
     }
 
-    public static void clearHistory() {
+    public void clearHistory() {
         historyList.clear();
     }
 

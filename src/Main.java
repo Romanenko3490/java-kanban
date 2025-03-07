@@ -47,7 +47,7 @@ public class Main {
 //        System.out.println("_____________________________________________" + "\n");
 
 //      Тесты истории
-        System.out.println(InMemoryHistoryManager.getHistory());
+        System.out.println(inMemoryTaskManager.getHistoryManager().getHistory());
 
         for (int i = 1; i < 13; i++) {
             Task task = new Task("Задача " + i, "дескрипшен " + i);
@@ -59,7 +59,7 @@ public class Main {
             inMemoryTaskManager.getTaskByID(i);
         }
         System.out.println();
-        System.out.println(InMemoryHistoryManager.getHistory());
+        System.out.println(inMemoryTaskManager.getHistoryManager().getHistory());
 
         Epic epic = new Epic("epic 1", "description epic");
         epic.createSubtask("sub1", "des1");
@@ -70,7 +70,7 @@ public class Main {
         inMemoryTaskManager.getSubtaskByID(14);
         inMemoryTaskManager.getSubtaskByID(15);
         System.out.println();
-        System.out.println(InMemoryHistoryManager.getHistory());
+        System.out.println(inMemoryTaskManager.getHistoryManager().getHistory());
     }
 
 }
