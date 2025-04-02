@@ -111,4 +111,3 @@ public class InMemoryHistoryManager implements HistoryManager {
         return copyOfHistorymap;
     }
 }
-s
