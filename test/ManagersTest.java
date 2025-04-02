@@ -1,4 +1,4 @@
-import Utility.Managers;
+import utility.Managers;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
