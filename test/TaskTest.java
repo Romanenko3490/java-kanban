@@ -58,7 +58,7 @@ class TaskTest {
 
     @Test
     public void checkIdCounter() {
-        assertEquals(2, Task.getIdCounter(),Task.getIdCounter());
+        assertEquals(2, Task.getIdCounter(), Task.getIdCounter());
     }
 
     @Test

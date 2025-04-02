@@ -73,7 +73,7 @@ public class Epic extends AbstractTask {
     @Override
     public String toString() {
         return "Epic{ ID='" + getId() + "', name='" + getName() + "', description='" + getDescription() +
-                "', status='" + getStatus() +"', contains subtasks:\n" + getSubtaskList();
+                "', status='" + getStatus() + "', contains subtasks:\n" + getSubtaskList();
     }
 
 

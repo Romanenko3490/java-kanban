@@ -1,9 +1,10 @@
 package controllers;
 
 import models.AbstractTask;
+
 import java.util.ArrayList;
 
-public interface HistoryManager <T extends AbstractTask> {
+public interface HistoryManager<T extends AbstractTask> {
 
     //Получение истории просмотров, получение последних 10 просмотренных задач
     ArrayList<AbstractTask> getHistory();

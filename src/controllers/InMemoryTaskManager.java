@@ -2,9 +2,10 @@ package controllers;
 
 import Utility.Managers;
 import models.*;
+
 import java.util.*;
 
-public class InMemoryTaskManager <T extends AbstractTask> implements TaskManager {
+public class InMemoryTaskManager<T extends AbstractTask> implements TaskManager {
     private final HistoryManager historyManager = Managers.getDefaultHistory();
     private final Map<Integer, Epic> epicStore = new HashMap();
     private final Map<Integer, Task> taskStore = new HashMap<>();
@@ -80,13 +81,13 @@ public class InMemoryTaskManager <T extends AbstractTask> implements TaskManager
     // d. Создание. Сам объект должен передаваться в качестве параметра.
     @Override
     public void addNewEpic(Epic epic) {
-       if (epic.getSubtaskList().size() == 0) {
-           this.epicStore.put(epic.getId(), epic);
-       } else if (epic.getSubtaskList().size() > 0) {
-           List<Subtask> subtasks = epic.getSubtaskList();
-           addNewSubtasks(subtasks);
-           this.epicStore.put(epic.getId(),epic);
-       }
+        if (epic.getSubtaskList().size() == 0) {
+            this.epicStore.put(epic.getId(), epic);
+        } else if (epic.getSubtaskList().size() > 0) {
+            List<Subtask> subtasks = epic.getSubtaskList();
+            addNewSubtasks(subtasks);
+            this.epicStore.put(epic.getId(), epic);
+        }
     }
 
     @Override
@@ -101,10 +102,11 @@ public class InMemoryTaskManager <T extends AbstractTask> implements TaskManager
 
     @Override
     public void addNewSubtasks(List<Subtask> subtaskList) {
-        for (Subtask subtask: subtaskList) {
+        for (Subtask subtask : subtaskList) {
             subtaskStore.put(subtask.getId(), subtask);
         }
     }
+
     // e. Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
     @Override
     public void updateEpic(int id, String name, String description) {
@@ -136,7 +138,7 @@ public class InMemoryTaskManager <T extends AbstractTask> implements TaskManager
     public void deleteEpicByID(int id) {
         List<Subtask> subtasksForDelete = new ArrayList<>();
         for (Subtask subtask : subtaskStore.values()) {
-            if (subtask.getEpicID() == id){
+            if (subtask.getEpicID() == id) {
                 subtasksForDelete.add(subtask);
             }
         }

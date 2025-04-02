@@ -55,24 +55,24 @@ class InMemoryTaskManagerTest {
     @Test
     public void tasksShellBeUpdated() {
         inMemoryTaskManager.updateSubtask(3, "UpdatedSubtask", "NewDescription", Status.DONE);
-        inMemoryTaskManager.updateTask(2,"UpdatedTask", "UpdatedTaskDescription", Status.IN_PROGRESS);
+        inMemoryTaskManager.updateTask(2, "UpdatedTask", "UpdatedTaskDescription", Status.IN_PROGRESS);
         inMemoryTaskManager.updateEpic(1, "UpdatedEpic", "UpdatedEpicDescription");
 
         assertEquals(3, subtask.getId());
-        assertEquals("UpdatedSubtask" ,subtask.getName());
-        assertEquals("NewDescription" ,subtask.getDescription());
-        assertEquals(Status.DONE ,subtask.getStatus());
+        assertEquals("UpdatedSubtask", subtask.getName());
+        assertEquals("NewDescription", subtask.getDescription());
+        assertEquals(Status.DONE, subtask.getStatus());
         assertEquals(1, subtask.getEpicID());
 
         assertEquals(2, task.getId());
-        assertEquals("UpdatedTask" ,task.getName());
-        assertEquals("UpdatedTaskDescription" ,task.getDescription());
-        assertEquals(Status.IN_PROGRESS ,task.getStatus());
+        assertEquals("UpdatedTask", task.getName());
+        assertEquals("UpdatedTaskDescription", task.getDescription());
+        assertEquals(Status.IN_PROGRESS, task.getStatus());
 
         assertEquals(1, epic.getId());
-        assertEquals("UpdatedEpic" ,epic.getName());
-        assertEquals("UpdatedEpicDescription" ,epic.getDescription());
-        assertEquals(Status.DONE ,epic.getStatus());
+        assertEquals("UpdatedEpic", epic.getName());
+        assertEquals("UpdatedEpicDescription", epic.getDescription());
+        assertEquals(Status.DONE, epic.getStatus());
     }
 
     @Test
@@ -103,7 +103,7 @@ class InMemoryTaskManagerTest {
 
     @Test
     public void allSubtasksShellDeletedWhenTheirEpicDeleted() {
-        Subtask sub = new Subtask("sub","des");
+        Subtask sub = new Subtask("sub", "des");
         epic.addSubtask(sub);
         inMemoryTaskManager.addNewSubtask(sub);
 

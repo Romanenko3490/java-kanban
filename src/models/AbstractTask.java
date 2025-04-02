@@ -33,6 +33,7 @@ public abstract class AbstractTask {
     public Status getStatus() {
         return status;
     }
+
     public static int getIdCounter() {
         return idCounter;
     }

@@ -80,7 +80,7 @@ class InMemoryHistoryManagerTest {
         }
 
         historyListSize = inMemoryTaskManager.getHistoryManager().getSize();
-        assertEquals(10,historyListSize);
+        assertEquals(10, historyListSize);
     }
 
     @Test
