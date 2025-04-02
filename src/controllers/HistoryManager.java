@@ -11,5 +11,5 @@ public interface HistoryManager <T extends AbstractTask> {
     //Логика добавления задачи в список истории просмотра. Назвал метод не add как в задании, а то не понятно куда add
     void addToHistory(AbstractTask task);
 
-
+    void remove(int id);
 }

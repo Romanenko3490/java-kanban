@@ -5,7 +5,7 @@ import models.*;
 import java.util.*;
 
 public class InMemoryTaskManager <T extends AbstractTask> implements TaskManager {
-    private final HistoryManager historyManager = Managers.getDefaultHistory(); // я так понимаю это паттерн проектирования Декоратор? =)
+    private final HistoryManager historyManager = Managers.getDefaultHistory();
     private final Map<Integer, Epic> epicStore = new HashMap();
     private final Map<Integer, Task> taskStore = new HashMap<>();
     private final Map<Integer, Subtask> subtaskStore = new HashMap<>();
@@ -31,21 +31,31 @@ public class InMemoryTaskManager <T extends AbstractTask> implements TaskManager
     // b. Удаление всех задач.
     @Override
     public void clearEpicStore() {
+        for (Integer epicID : epicStore.keySet()) {
+            historyManager.remove(epicID);
+        }
         epicStore.clear();
+
+        for (Integer subtaskID : subtaskStore.keySet()) {
+            historyManager.remove(subtaskID);
+        }
         subtaskStore.clear();
     }
 
     @Override
     public void clearTaskStore() {
+        for (Integer taskID : taskStore.keySet())
+            historyManager.remove(taskID);
         taskStore.clear();
     }
 
     @Override
     public void clearSubtaskStore() {
-        subtaskStore.clear();
-        for (Epic epic : epicStore.values()) {
+        for (Epic epic : epicStore.values())
             epic.clearSubtasks();
-        }
+        for (Integer subtaskID : subtaskStore.keySet())
+            historyManager.remove(subtaskID);
+        subtaskStore.clear();
     }
 
     // c. Получение по идентификатору.
@@ -132,14 +142,16 @@ public class InMemoryTaskManager <T extends AbstractTask> implements TaskManager
         }
         for (Subtask subtask : subtasksForDelete) {
             subtaskStore.remove(subtask.getId());
+            historyManager.remove(subtask.getId());
         }
         epicStore.remove(id);
+        historyManager.remove(id);
     }
 
     @Override
     public void deleteTaskByID(int id) {
-
         taskStore.remove(id);
+        historyManager.remove(id);
     }
 
     @Override
@@ -148,6 +160,7 @@ public class InMemoryTaskManager <T extends AbstractTask> implements TaskManager
         Epic epicToChange = epicStore.get(subtaskToDelete.getEpicID());
         epicToChange.deleteSubtask(id);
         subtaskStore.remove(id);
+        historyManager.remove(id);
     }
 
     //Получение списка всех подзадач определённого эпика.
