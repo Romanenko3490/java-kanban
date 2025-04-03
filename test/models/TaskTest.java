@@ -1,6 +1,5 @@
-import models.AbstractTask;
-import models.Status;
-import models.Task;
+package models;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;

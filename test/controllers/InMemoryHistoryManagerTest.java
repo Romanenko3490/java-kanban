@@ -1,4 +1,5 @@
-import controllers.InMemoryTaskManager;
+package controllers;
+
 import models.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -149,21 +150,4 @@ class InMemoryHistoryManagerTest {
         assertTrue(inMemoryTaskManager.getHistoryManager().getHistory().isEmpty());
 
     }
-
-    @Test
-    public void shellRemoveAllNodes() {
-        inMemoryTaskManager.getHistoryManager().addToHistory(subtask);
-        inMemoryTaskManager.getHistoryManager().addToHistory(epic);
-        inMemoryTaskManager.getHistoryManager().addToHistory(task);
-
-        assertTrue(inMemoryTaskManager.getHistoryManager().getHistory().contains(subtask));
-        assertTrue(inMemoryTaskManager.getHistoryManager().getHistory().contains(epic));
-        assertTrue(inMemoryTaskManager.getHistoryManager().getHistory().contains(task));
-
-        inMemoryTaskManager.getHistoryManager().clearHistory();
-        assertEquals(0, inMemoryTaskManager.getHistoryManager().getSize());
-        assertEquals(0, inMemoryTaskManager.getHistoryManager().getHistoryMap().size());
-
-    }
-
 }
