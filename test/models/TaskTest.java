@@ -1,6 +1,5 @@
-import models.AbstractTask;
-import models.Status;
-import models.Task;
+package models;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -58,7 +57,7 @@ class TaskTest {
 
     @Test
     public void checkIdCounter() {
-        assertEquals(2, Task.getIdCounter(),Task.getIdCounter());
+        assertEquals(2, Task.getIdCounter(), Task.getIdCounter());
     }
 
     @Test

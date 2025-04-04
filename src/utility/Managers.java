@@ -1,4 +1,4 @@
-package Utility;
+package utility;
 
 import controllers.HistoryManager;
 import controllers.InMemoryHistoryManager;
@@ -9,7 +9,6 @@ public class Managers {
 
     //Да, наверное вы правы, обобщение тут ни к чему, если будет множество разных менеджеров.
 
-    //Возможно наворотил бутерброд какой-то тут =)
     public TaskManager getDefault() {
         TaskManager manager = new InMemoryTaskManager<>();
         return manager;

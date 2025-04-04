@@ -1,7 +1,5 @@
-import models.AbstractTask;
-import models.Epic;
-import models.Status;
-import models.Subtask;
+package models;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -73,16 +71,10 @@ class EpicTest {
 
         int subtasklistSize = epic.getSubtaskList().size();
 
-        assertEquals(2,subtasklistSize);
+        assertEquals(2, subtasklistSize);
 
         epic.clearSubtasks();
         subtasklistSize = epic.getSubtaskList().size();
-        assertEquals(0,subtasklistSize);
+        assertEquals(0, subtasklistSize);
     }
-
-    //проверьте, что объект Epic нельзя добавить в самого себя в виде подзадачи;
-    //Класс сабтаск не является подклассом епика, не получится в ArrayList<Subtask> subtasks добавить бъект класса Эпик
-
-
-
 }
