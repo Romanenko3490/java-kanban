@@ -67,9 +67,9 @@ class FileBackedTaskManagerTest {
         System.out.println(lines);
         assertEquals(4, lines.size());
         assertEquals("id,type,name,status,description,epic", lines.getFirst());
-        assertEquals("2,TASK,Task,NEW,Task Description", lines.get(1));
-        assertEquals("1,EPIC,Epic,NEW,Epic Description", lines.get(2));
-        assertEquals("3,SUBTASK,Subtask,NEW,Subtask description,1", lines.get(3));
+        assertEquals("2,TASK,Task,NEW,Task Description,}", lines.get(1));
+        assertEquals("1,EPIC,Epic,NEW,Epic Description,}", lines.get(2));
+        assertEquals("3,SUBTASK,Subtask,NEW,Subtask description,1,}", lines.get(3));
     }
 
     @Test
