@@ -60,6 +60,10 @@ public abstract class AbstractTask {
         this.id = id;
     }
 
+    public static void setIdCounter(int newIdCounter) {
+        idCounter = newIdCounter;
+    }
+
 
     //Переопределения методов, для сравнения по айди
     @Override
