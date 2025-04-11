@@ -34,7 +34,7 @@ public class Subtask extends AbstractTask {
 
     public String stringForSerialize() {
         return getId() + "," + Types.SUBTASK + "," + getName() + "," +
-                getStatus() + "," + getDescription() + "," + getEpicID() +",}";
+                getStatus() + "," + getDescription() + "," + getEpicID() + ",}";
     }
 
     @Override
