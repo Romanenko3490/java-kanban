@@ -12,6 +12,13 @@ public class Subtask extends AbstractTask {
         this.status = status;
     }
 
+    public Subtask(Integer id, String name, String description, Status status, Integer epicID) {
+        super(name, description);
+        this.status = status;
+        setId(id);
+        this.epicID = epicID;
+    }
+
     public void setStatus(Status newStatus) {
         this.status = newStatus;
     }
@@ -24,6 +31,11 @@ public class Subtask extends AbstractTask {
         return epicID;
     }
 
+
+    public String stringForSerialize() {
+        return getId() + "," + Types.SUBTASK + "," + getName() + "," +
+                getStatus() + "," + getDescription() + "," + getEpicID();
+    }
 
     @Override
     public String toString() {
