@@ -20,7 +20,7 @@ public class Task extends AbstractTask {
 
     public String stringForSerialize() {
         return getId() + "," + Types.TASK + "," + getName() + "," +
-                getStatus() + "," + getDescription();
+                getStatus() + "," + getDescription() + ",}";
     }
 
     @Override

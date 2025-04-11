@@ -34,13 +34,13 @@ public class Subtask extends AbstractTask {
 
     public String stringForSerialize() {
         return getId() + "," + Types.SUBTASK + "," + getName() + "," +
-                getStatus() + "," + getDescription() + "," + getEpicID();
+                getStatus() + "," + getDescription() + "," + getEpicID() +",}";
     }
 
     @Override
     public String toString() {
         return "Subtask{ ID='" + getId() + "' name='" + getName() + "', description='" + getDescription() + "' " +
-                "status='" + getStatus() + "' belongs to epic ID='" + getEpicID() + "'\n";
+                "status='" + getStatus() + "' belongs to epic ID='" + getEpicID() + "\n";
     }
 }
 

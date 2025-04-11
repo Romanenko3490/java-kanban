@@ -78,7 +78,7 @@ public class Epic extends AbstractTask {
 
     public String stringForSerialize() {
         return getId() + "," + Types.EPIC + "," + getName() + "," +
-                getStatus() + "," + getDescription();
+                getStatus() + "," + getDescription() + ",}";
     }
 
     @Override

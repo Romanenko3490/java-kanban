@@ -11,7 +11,7 @@ import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    Path path;
+    private Path path;
 
     public FileBackedTaskManager(Path path) {
         if (Files.exists(path)) {
@@ -130,11 +130,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         } catch (IOException e) {
             throw new ManagerSaveException("Произошла ошибка сохранения", e);
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            System.out.println("Некорректные данные");
-            e.printStackTrace();
         }
     }
 
@@ -171,11 +166,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Ошибка чтения файла" + e.getMessage());
-        } catch (RuntimeException e) {
-            System.out.println("Ошибка при обработке данных");
+            throw new ManagerSaveException("Произошла ошибка загрузки", e);
         }
-        updateIdCounter(path);
         return fileBackedTaskManager;
     }
 
@@ -188,29 +180,5 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             return Status.DONE;
     }
 
-
-    //Написал метод для обнавления idCounter, почему-то и без него айди получался нормальный,
-    //но мне кажется могут быть конфликты при загрузке, хотя у меня не получилось их смоделировать.
-    //Может быть этот метод лишний.
-    private static void updateIdCounter(Path path) {
-        int maxId = 0;
-        try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(path.toFile()));
-            while (bufferedReader.ready()) {
-                String line = bufferedReader.readLine();
-                if (line.startsWith("id,type"))
-                    continue;
-                String[] split = line.split(",");
-                int currentID = Integer.parseInt(split[0]);
-                if (currentID > maxId) {
-                    maxId = currentID;
-                }
-
-            }
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-        AbstractTask.setIdCounter(maxId + 1);
-    }
 }
 
