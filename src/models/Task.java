@@ -11,6 +11,18 @@ public class Task extends AbstractTask {
         this.status = status;
     }
 
+    public Task(Integer id, String name, String description, Status status) {
+        super(name, description);
+        this.status = status;
+        this.setId(id);
+    }
+
+
+    public String stringForSerialize() {
+        return getId() + "," + Types.TASK + "," + getName() + "," +
+                getStatus() + "," + getDescription() + ",}";
+    }
+
     @Override
     public String toString() {
         return "Task{ ID='" + getId() + "' name='" + getName() + "', description='" + getDescription() + "' " +

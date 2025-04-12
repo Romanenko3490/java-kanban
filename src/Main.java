@@ -1,55 +1,53 @@
 import models.*;
 import controllers.*;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class Main {
 
     public static void main(String[] args) {
-        InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
-        Task task1 = new Task("Task 1", "Description task 1");
-        Task task2 = new Task("Task 2", "Description task 2");
-        Epic epic1 = new Epic("epic 1", "decription epic 1");
-        epic1.createSubtask("subtask 1", "Description subtask 1");
-        epic1.createSubtask("subtask 2", "description subtask 2");
-        epic1.createSubtask("subtask 3", "desceiption subtask 3");
-        Epic epic2 = new Epic("Epic 2", "Description Epic 2");
-        inMemoryTaskManager.addNewTask(task1);
-        inMemoryTaskManager.addNewTask(task2);
-        inMemoryTaskManager.addNewEpic(epic1);
-        inMemoryTaskManager.addNewEpic(epic2);
-        inMemoryTaskManager.addNewSubtasks(epic1.getSubtaskList());
+        //сохранение
+//        Task task1 = new Task("Task 1", "Description task 1");
+//        Task task2 = new Task("Task 2", "Description task 2");
+//        Epic epic1 = new Epic("epic 1", "decription epic 1");
+//        epic1.createSubtask("subtask 1", "Description subtask 1");
+//        epic1.createSubtask("subtask 2", "description subtask 2");
+//        epic1.createSubtask("subtask 3", "desceiption subtask 3");
+//        Epic epic2 = new Epic("Epic 2", "Description Epic 2");
+//
+//        Path path = Paths.get("src//resources//save.csv");
+//        FileBackedTaskManager fm = new FileBackedTaskManager(path);
+//        fm.addNewTask(task1);
+//        fm.addNewTask(task2);
+//        fm.addNewEpic(epic1);
+//        fm.addNewSubtasks(epic1.getSubtaskList());
+//
+//        fm.addNewEpic(epic2);
+//        fm.deleteEpicByID(7);
+//        fm.deleteTaskByID(2);
 
-        inMemoryTaskManager.getTaskByID(2);
-        inMemoryTaskManager.getEpicByID(7);
-        inMemoryTaskManager.getSubtaskByID(5);
-        inMemoryTaskManager.getSubtaskByID(4);
-        inMemoryTaskManager.getEpicByID(7);
-        inMemoryTaskManager.getEpicByID(3);
-        inMemoryTaskManager.getEpicByID(7);
-        inMemoryTaskManager.getEpicByID(7);
-        inMemoryTaskManager.getEpicByID(7);
-        inMemoryTaskManager.getTaskByID(2);
-        System.out.println(inMemoryTaskManager.getHistoryManager().getHistory());
-        System.out.println(inMemoryTaskManager.getHistoryManager().getSize());
-        //вызывов гетера 10 раз, уникальных айди 5, сайз двусвязного списка - 5
+        // загрузка
+        Path path = Paths.get("src//resources//save.csv");
+        FileBackedTaskManager fm = FileBackedTaskManager.loadFromFile(path);
 
-        inMemoryTaskManager.deleteTaskByID(2);
+        System.out.println(fm.getTaskStore());
         System.out.println();
+        System.out.println(fm.getEpicStore());
         System.out.println();
-        System.out.println(inMemoryTaskManager.getHistoryManager().getHistory());
-        inMemoryTaskManager.deleteSubtaskByID(6);
+        System.out.println(fm.getSubtaskStore());
+
+        Task task = new Task("task new", "des new");
+        fm.addNewTask(task);
+        //System.out.println(fm.getTaskStore());
+
+        Epic epic = new Epic("epic new", "dwe");
+        fm.addNewEpic(epic);
         System.out.println();
+        System.out.println(fm.getTaskStore());
         System.out.println();
-        System.out.println(inMemoryTaskManager.getHistoryManager().getHistory());
-        inMemoryTaskManager.clearTaskStore();
-        System.out.println();
-        System.out.println();
-        System.out.println(inMemoryTaskManager.getHistoryManager().getHistory());
-        inMemoryTaskManager.deleteEpicByID(3);
-        System.out.println();
-        System.out.println();
-        System.out.println(inMemoryTaskManager.getHistoryManager().getHistory());
-        System.out.println(inMemoryTaskManager.getHistoryManager().getSize());
-        // в истории остался только один эпик йди - 7, длинна двусвязного списка - 1
+        System.out.println(fm.getEpicStore());
+
 
     }
 

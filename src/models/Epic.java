@@ -10,6 +10,12 @@ public class Epic extends AbstractTask {
         super(name, description);
     }
 
+    public Epic(Integer id, String name, String description, Status status) {
+        super(name, description);
+        this.status = status;
+        setId(id);
+    }
+
     private void setStatus() {
         int newCount = 0;
         int completedCount = 0;
@@ -69,6 +75,11 @@ public class Epic extends AbstractTask {
         subtaskList.remove(subtaskToDelete);
     }
 
+
+    public String stringForSerialize() {
+        return getId() + "," + Types.EPIC + "," + getName() + "," +
+                getStatus() + "," + getDescription() + ",}";
+    }
 
     @Override
     public String toString() {
