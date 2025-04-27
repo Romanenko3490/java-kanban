@@ -2,7 +2,6 @@ package models;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 public class Subtask extends AbstractTask {
     private int epicID;
