@@ -1,11 +1,8 @@
 package models;
 
-import javax.swing.plaf.PanelUI;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
-import java.util.Optional;
 
 public abstract class AbstractTask {
     private static int idCounter = 1;
