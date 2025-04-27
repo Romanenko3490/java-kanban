@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TaskTest {
     Task task1 = new Task("Task1", "Description1");
-    Task task2 = new Task("Task2", "Description2", Status.DONE);
+    Task task2 = new Task("Task2", "Description2", Status.DONE, "11.11.2020 12:00", 30);
 
     @AfterEach
     public void resetIdCounter() {

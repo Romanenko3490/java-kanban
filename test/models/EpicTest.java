@@ -26,7 +26,7 @@ class EpicTest {
 
     @Test
     public void checkListOfSubtasks() {
-        epic.createSubtask("subtask", "subdescription");
+        epic.createSubtask("subtask", "subdescription", "24.10.1991 12:00", 10);
 
         Subtask subtask = epic.getSubtaskList().getFirst();
 
@@ -40,8 +40,8 @@ class EpicTest {
     public void statusOfEpicShellChangedWithStatusOfHisSubtasks() {
         assertEquals(Status.NEW, epic.getStatus());
 
-        epic.createSubtask("subtask", "subdescription");
-        epic.createSubtask("subtask2", "subdescription2", Status.DONE);
+        epic.createSubtask("subtask", "subdescription", "24.10.1992 12:00", 30);
+        epic.createSubtask("subtask2", "subdescription2", Status.DONE, "24.10.1993 15:00", 30);
 
         String subtaskList = epic.getSubtaskList().toString();
         assertEquals(Status.IN_PROGRESS, epic.getStatus(), subtaskList);
@@ -53,8 +53,8 @@ class EpicTest {
 
     @Test
     public void subtaskWithId3ShellBeDeleted() {
-        epic.createSubtask("subtask", "subdescription");
-        epic.createSubtask("subtask2", "subdescription2", Status.DONE);
+        epic.createSubtask("subtask", "subdescription", "24.10.1994 12:00", 30);
+        epic.createSubtask("subtask2", "subdescription2", Status.DONE, null, 0);
 
         ArrayList<Subtask> subtasksListForTest = new ArrayList<>();
         subtasksListForTest.add(epic.getSubtaskList().getFirst());
@@ -66,8 +66,8 @@ class EpicTest {
 
     @Test
     public void subtasksListSizeShellBe0() {
-        epic.createSubtask("subtask", "subdescription");
-        epic.createSubtask("subtask2", "subdescription2", Status.DONE);
+        epic.createSubtask("subtask", "subdescription", null, 0);
+        epic.createSubtask("subtask2", "subdescription2", Status.DONE, "24.04.1099 12:00", 30);
 
         int subtasklistSize = epic.getSubtaskList().size();
 
@@ -76,5 +76,24 @@ class EpicTest {
         epic.clearSubtasks();
         subtasklistSize = epic.getSubtaskList().size();
         assertEquals(0, subtasklistSize);
+    }
+
+    @Test
+    public void testOfEpicStatusBorderCases() {
+        Epic epic1 = new Epic("epic 1", "Des 1");
+        epic1.createSubtask("Subtask 1", "Description 1", "24.10.2024 12:00", 30);
+        epic1.createSubtask("Subtask 2", "Description 2", "24.10.2024 13:00", 30);
+        epic1.createSubtask("Subtask 3", "Description 3", "24.10.2024 14:00", 30);
+
+        assertEquals(Status.NEW, epic1.getStatus());
+
+        epic1.getSubtaskList().forEach(subtask -> subtask.setStatus(Status.DONE));
+        assertEquals(Status.DONE, epic1.getStatus());
+
+        epic1.getSubtaskList().getFirst().setStatus(Status.NEW);
+        assertEquals(Status.IN_PROGRESS, epic1.getStatus());
+
+        epic1.getSubtaskList().forEach(subtask -> subtask.setStatus(Status.IN_PROGRESS));
+        assertEquals(Status.IN_PROGRESS, epic1.getStatus());
     }
 }

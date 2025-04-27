@@ -76,14 +76,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void updateTask(int id, String name, String description, Status status) {
-        super.updateTask(id, name, description, status);
+    public void updateTask(int id, String name, String description, Status status, String startTime, int durationInMin) {
+        super.updateTask(id, name, description, status, startTime, durationInMin);
+
         save();
     }
 
     @Override
-    public void updateSubtask(int id, String name, String description, Status status) {
-        super.updateSubtask(id, name, description, status);
+    public void updateSubtask(int id, String name, String description, Status status, String startTime, int durationInMin) {
+        super.updateSubtask(id, name, description, status, startTime, durationInMin);
         save();
     }
 
@@ -107,25 +108,34 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public void save() {
         try (Writer writer = new FileWriter(String.valueOf(path))) {
-            writer.write("id,type,name,status,description,epic\n");
+            writer.write("id,type,name,status,description,start time, duration in min, epic id \n");
             ArrayList<Task> tasks = getTaskStore();
-            if (!tasks.isEmpty()) {
-                for (Task task : tasks) {
-                    writer.write(task.stringForSerialize() + "\n");
+            tasks.stream().map(Task::stringForSerialize).forEach(s -> {
+                try {
+                    writer.write(s + "\n");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
-            }
+            });
+
             ArrayList<Epic> epics = getEpicStore();
-            if (!epics.isEmpty()) {
-                for (Epic epic : epics) {
-                    writer.write(epic.stringForSerialize() + "\n");
+            epics.stream().map(Epic::stringForSerialize).forEach(s -> {
+                try {
+                    writer.write(s + "\n");
+                } catch (IOException e) {
+                    throw new RuntimeException();
                 }
-            }
+            });
+
+
             ArrayList<Subtask> subtasks = getSubtaskStore();
-            if (!subtasks.isEmpty()) {
-                for (Subtask subtask : subtasks) {
-                    writer.write(subtask.stringForSerialize() + "\n");
+            subtasks.stream().map(Subtask::stringForSerialize).forEach(s -> {
+                try {
+                    writer.write(s + "\n");
+                } catch (IOException e) {
+                    throw new RuntimeException();
                 }
-            }
+            });
 
 
         } catch (IOException e) {
@@ -147,17 +157,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     String name = split[2];
                     String description = split[4];
                     Status status = checkStatus(split[3]);
+                    String startTime = checkStartTime(split[5]);
+                    Integer durationInMin = Integer.parseInt(split[6]);
 
                     if (split[1].equals(Types.TASK.toString())) {
-                        Task task = new Task(id, name, description, status);
+                        Task task = new Task(id, name, description, status, startTime, durationInMin);
                         fileBackedTaskManager.addNewTask(task);
                     } else if (split[1].equals(Types.EPIC.toString())) {
-                        Epic epic = new Epic(id, name, description, status);
+                        Epic epic = new Epic(id, name, description, status, startTime, durationInMin);
                         fileBackedTaskManager.addNewEpic(epic);
                     } else if (split[1].equals(Types.SUBTASK.toString())) {
-                        Integer epicID = Integer.parseInt(split[5]);
-                        Subtask subtask = new Subtask(id, name, description, status, epicID);
-                        Epic epicToAddSubtask = fileBackedTaskManager.getEpicByID(epicID);
+                        Integer epicID = Integer.parseInt(split[7]);
+                        Subtask subtask = new Subtask(id, name, description, status, startTime, durationInMin, epicID);
+                        Epic epicToAddSubtask = (Epic) fileBackedTaskManager.getEpicByID(epicID).get();
                         epicToAddSubtask.addSubtask(subtask);
                         fileBackedTaskManager.addNewSubtask(subtask);
                     }
@@ -176,8 +188,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             return Status.NEW;
         } else if (string.equals("IN_PROGRESS")) {
             return Status.IN_PROGRESS;
-        } else
-            return Status.DONE;
+        } else return Status.DONE;
+    }
+
+    private static String checkStartTime(String str) {
+        if (str.equals("null")) return null;
+        return str;
     }
 
 }

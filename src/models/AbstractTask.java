@@ -1,6 +1,11 @@
 package models;
 
+import javax.swing.plaf.PanelUI;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.Optional;
 
 public abstract class AbstractTask {
     private static int idCounter = 1;
@@ -8,6 +13,8 @@ public abstract class AbstractTask {
     private String name;
     private String description;
     protected Status status;
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+
 
     public AbstractTask(String name, String description) {
         this.name = name;
@@ -64,6 +71,16 @@ public abstract class AbstractTask {
         idCounter = newIdCounter;
     }
 
+
+    abstract public String getStartTime();
+
+    abstract public Duration getDuration();
+
+    abstract public String getEndTime();
+
+    public DateTimeFormatter getFormatter() {
+        return formatter;
+    }
 
     //Переопределения методов, для сравнения по айди
     @Override
