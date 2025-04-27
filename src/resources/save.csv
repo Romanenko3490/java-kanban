@@ -1,9 +1,5 @@
 id,type,name,status,description,start time, duration in min, epic id 
-1,TASK,task 1,NEW,desc,01.01.1801 15:00,60,}
-3,EPIC,epic,NEW,desc,24.10.1991 13:50,50,}
-6,EPIC,epic2,NEW,des,null,0,}
-7,EPIC,asda,NEW,asdasd,24.04.2025 19:00,110,}
-2,SUBTASK,subtask,NEW,desc,24.10.1991 13:50,50,3,}
-5,SUBTASK,sub,NEW,de,null,0,3,}
-8,SUBTASK,asd,NEW,asda,24.04.2025 19:00,50,7,}
-9,SUBTASK,q121,NEW,2e,24.04.2025 20:00,60,7,}
+2,TASK,task2,NEW,desc2,24.10.2005 12:00,30,}
+6,EPIC,epic2,NEW,des,24.10.1990 13:00,180,}
+7,SUBTASK,subID7,NEW,des,24.10.1990 13:00,120,6,}
+8,SUBTASK,subtId8,NEW,des,24.10.1991 15:00,60,6,}

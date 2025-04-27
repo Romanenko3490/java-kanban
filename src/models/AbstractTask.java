@@ -1,6 +1,7 @@
 package models;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
@@ -10,6 +11,9 @@ public abstract class AbstractTask {
     private String name;
     private String description;
     protected Status status;
+    private Duration duration;
+    private LocalDateTime startTime;
+
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
 
@@ -70,15 +74,40 @@ public abstract class AbstractTask {
 
 
     public String getStartTime() {
-        return null;
+        return this.startTime != null ? startTime.format(getFormatter()) : null;
+    }
+
+    public LocalDateTime getStartTimeInFormat() {
+        return this.startTime;
     }
 
     public Duration getDuration() {
-        return null;
+        return duration != null ? duration : Duration.ZERO;
+    }
+
+
+    public void setDuration(int durationInMin) {
+        this.duration = Duration.ofMinutes(durationInMin);
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime != null ? LocalDateTime.parse(startTime, getFormatter()) : null;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
     }
 
     public String getEndTime() {
-        return null;
+        if (getStartTime() != null) {
+            LocalDateTime endTime = LocalDateTime.parse(getStartTime(), getFormatter()).plusMinutes(getDuration().toMinutes());
+            return endTime.format(getFormatter());
+        } else
+            return null;
     }
 
     public DateTimeFormatter getFormatter() {

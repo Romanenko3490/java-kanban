@@ -6,8 +6,8 @@ import java.util.*;
 
 public class Epic extends AbstractTask {
     private final List<Subtask> subtaskList = new ArrayList<>();
-    Duration duration;
-    LocalDateTime startTime;
+    private LocalDateTime endTime;
+
 
     public Epic(String name, String description) {
         super(name, description);
@@ -17,8 +17,8 @@ public class Epic extends AbstractTask {
         super(name, description);
         this.status = status;
         setId(id);
-        this.duration = Duration.ofMinutes(durationInMin);
-        this.startTime = startTime != null ? LocalDateTime.parse(startTime, getFormatter()) : null;
+        setDuration(durationInMin);
+        setStartTime(startTime);
 
     }
 
@@ -46,59 +46,60 @@ public class Epic extends AbstractTask {
         return status;
     }
 
-    private Optional<LocalDateTime> calcStartTime() {
 
+    @Override
+    public String getStartTime() {
         if (subtaskList.isEmpty()) {
-            startTime = null;
-            return Optional.empty();
+            setStartTime((String) null);
+            return null;
         } else {
-            Optional<LocalDateTime> erliestSub = subtaskList.stream()
+            Optional<LocalDateTime> erliestSubTime = subtaskList.stream()
                     .map(Subtask::getStartTime)
                     .filter(Objects::nonNull)
                     .map(time -> LocalDateTime.parse(time, getFormatter()))
                     .min(LocalDateTime::compareTo);
 
-            erliestSub.ifPresent(time -> startTime = time);
-            return erliestSub;
-        }
-
-    }
-
-    @Override
-    public String getStartTime() {
-        calcStartTime();
-        return startTime != null ? startTime.format(getFormatter()) : null;
-    }
-
-    private Duration calcDuration() {
-        duration = Duration.ofMinutes(0);
-        if (subtaskList.isEmpty()) {
-            return duration;
-        } else {
-            for (Subtask subtask : subtaskList) {
-                if (subtask.getDuration() != null) {
-                    duration = duration.plus(subtask.getDuration()); // про иммутабельность класса в теории не написано =(
-                }
-            }
-            return duration;
+            if (erliestSubTime.isPresent()) {
+                setStartTime(erliestSubTime.get());
+                return erliestSubTime.get().format(getFormatter());
+            } else
+                return null;
         }
     }
 
     @Override
     public Duration getDuration() {
-        calcDuration();
-        return duration;
+        setDuration(Duration.ZERO);
+        if (subtaskList.isEmpty()) {
+            return Duration.ZERO;
+        } else {
+            Duration temp = Duration.ZERO;
+            for (Subtask subtask : subtaskList) {
+                if (subtask.getDuration() != null) {
+                    temp = temp.plus(subtask.getDuration());
+                }
+            }
+            setDuration(temp);
+            return temp;
+        }
     }
 
     @Override
     public String getEndTime() {
-        calcStartTime();
-        calcDuration();
-        if (calcStartTime().isPresent()) {
-            LocalDateTime endTime = LocalDateTime.parse(calcStartTime().get().format(getFormatter()), getFormatter()).plusMinutes(duration.toMinutes());
-            return endTime.format(getFormatter());
-        } else
+        if (subtaskList.isEmpty()) {
             return null;
+        } else {
+            Optional<LocalDateTime> latestSubTime = subtaskList.stream()
+                    .map(Subtask::getEndTime)
+                    .filter(Objects::nonNull)
+                    .map(time -> LocalDateTime.parse(time, getFormatter()))
+                    .max(LocalDateTime::compareTo);
+            if (latestSubTime.isPresent()) {
+                endTime = latestSubTime.get();
+                return endTime.format(getFormatter());
+            }
+        }
+        return null;
     }
 
     public void addSubtask(Subtask subtask) {
@@ -122,12 +123,24 @@ public class Epic extends AbstractTask {
         subtask.setEpicID(getId());
     }
 
+    public void createSubtask(String name, String description) {
+        Subtask subtask = new Subtask(name, description);
+        subtaskList.add(subtask);
+        subtask.setEpicID(getId());
+    }
+
     public void clearSubtasks() {
         subtaskList.clear();
     }
 
     public void deleteSubtask(int id) {
-        subtaskList.removeIf(subtask -> subtask.getId() == id);
+        Subtask subtaskToDelete = null;
+        for (Subtask subtask : subtaskList) {
+            if (subtask.getId() == id) {
+                subtaskToDelete = subtask;
+            }
+        }
+        subtaskList.remove(subtaskToDelete);
     }
 
 

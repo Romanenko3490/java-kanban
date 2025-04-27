@@ -1,5 +1,6 @@
 package controllers;
 
+import exceptions.TimeConflictException;
 import models.*;
 import org.junit.jupiter.api.*;
 
@@ -89,9 +90,9 @@ class InMemoryTaskManagerTest {
     public void shellAddListOfSubtasks() {
         List<Subtask> subtasks = new ArrayList<>();
         Epic epicForTest = new Epic("Test Epic", "Test Epic DEscr");
-        epicForTest.createSubtask("sub1", "des1", "12.04.2024 12:00", 10);
-        epicForTest.createSubtask("sub2", "des2", "13.04.2024 12:00", 50);
-        epicForTest.createSubtask("sub3", "des3", Status.DONE, "14.04.2024 12:00", 30);
+        inMemoryTaskManager.createSubtaskForEpic(epicForTest, "sub1", "des1", "12.04.2024 12:00", 10);
+        inMemoryTaskManager.createSubtaskForEpic(epicForTest, "sub2", "des2", "13.04.2024 12:00", 50);
+        inMemoryTaskManager.createSubtaskForEpic(epicForTest, "sub3", "des3", "14.04.2024 12:00", 30);
 
         inMemoryTaskManager.addNewEpic(epicForTest);
 
@@ -121,6 +122,8 @@ class InMemoryTaskManagerTest {
         assertEquals(2, inMemoryTaskManager.getSubtaskStore().size());
 
         inMemoryTaskManager.deleteEpicByID(1);
+        System.out.println(inMemoryTaskManager.getEpicStore());
+        System.out.println(inMemoryTaskManager.getSubtaskStore());
         assertEquals(0, inMemoryTaskManager.getSubtaskStore().size());
     }
 
@@ -194,45 +197,61 @@ class InMemoryTaskManagerTest {
     public void testTimeConflictForTasksWithSameTime() {
         Task task1 = new Task("task", "des", "24.10.1991 12:00", 30);
         Task task2 = new Task("task2", "des2", "24.10.1991 12:00", 10);
-        Subtask sub1 = new Subtask("Sub", "sub des", "24.10.1991 12:00", 30);
         Epic epic1 = new Epic("epic", "epic des");
-        epic1.addSubtask(sub1);
 
         inMemoryTaskManager.addNewTask(task1);
         inMemoryTaskManager.addNewTask(task2);
+
+        try {
+            inMemoryTaskManager.createSubtaskForEpic(epic1, "Sub", "sub des", "24.10.1991 12:00", 30);
+        } catch (TimeConflictException e) {
+
+        }
+
         inMemoryTaskManager.addNewEpic(epic1);
 
         assertTrue(inMemoryTaskManager.getTaskStore().contains(task1));
         assertFalse(inMemoryTaskManager.getTaskStore().contains(task2));
-        assertFalse(inMemoryTaskManager.getSubtaskStore().contains(sub1));
-        assertFalse(inMemoryTaskManager.getEpicStore().contains(epic1));
+        if (!epic1.getSubtaskList().isEmpty()) {
+            Subtask sub = epic1.getSubtaskList().getFirst();
+            assertFalse(inMemoryTaskManager.getSubtaskStore().contains(sub));
+        }
+
+        assertTrue(inMemoryTaskManager.getEpicStore().contains(epic1));
     }
 
     @Test
     public void testTimeConflictForTasksWithCrossingTime() {
         Task task1 = new Task("task", "des", "24.10.1991 12:00", 30);
         Task task2 = new Task("task2", "des2", "24.10.1991 12:29", 10);
-        Subtask sub1 = new Subtask("Sub", "sub des", "24.10.1991 12:10", 30);
         Epic epic1 = new Epic("epic", "epic des");
-        epic1.addSubtask(sub1);
+
 
         inMemoryTaskManager.addNewTask(task1);
         inMemoryTaskManager.addNewTask(task2);
+        try {
+            inMemoryTaskManager.createSubtaskForEpic(epic1, "Sub", "sub des", "24.10.1991 12:10", 30);
+        } catch (TimeConflictException e) {
+
+        }
+        inMemoryTaskManager.addNewSubtasks(epic1.getSubtaskList());
         inMemoryTaskManager.addNewEpic(epic1);
 
         assertTrue(inMemoryTaskManager.getTaskStore().contains(task1));
         assertFalse(inMemoryTaskManager.getTaskStore().contains(task2));
-        assertFalse(inMemoryTaskManager.getSubtaskStore().contains(sub1));
-        assertFalse(inMemoryTaskManager.getEpicStore().contains(epic1));
+        if (!epic1.getSubtaskList().isEmpty()) {
+            assertFalse(inMemoryTaskManager.getSubtaskStore().contains(epic1.getSubtaskList().getFirst()));
+        }
+        assertTrue(inMemoryTaskManager.getEpicStore().contains(epic1));
     }
 
     @Test
     public void testTimeConflictForTasksWithContiniousTime() {
         Task task1 = new Task("task", "des", "24.10.1991 12:00", 30);
         Task task2 = new Task("task2", "des2", "24.10.1991 12:30", 10);
-        Subtask sub1 = new Subtask("Sub", "sub des", "24.10.1991 12:40", 30);
         Epic epic1 = new Epic("epic", "epic des");
-        epic1.addSubtask(sub1);
+        inMemoryTaskManager.createSubtaskForEpic(epic1, "Sub", "sub des", "24.10.1991 12:40", 30);
+
 
         inMemoryTaskManager.addNewTask(task1);
         inMemoryTaskManager.addNewTask(task2);
@@ -240,7 +259,7 @@ class InMemoryTaskManagerTest {
 
         assertTrue(inMemoryTaskManager.getTaskStore().contains(task1));
         assertTrue(inMemoryTaskManager.getTaskStore().contains(task2));
-        assertTrue(inMemoryTaskManager.getSubtaskStore().contains(sub1));
+        assertTrue(inMemoryTaskManager.getSubtaskStore().contains(epic1.getSubtaskList().getFirst()));
         assertTrue(inMemoryTaskManager.getEpicStore().contains(epic1));
     }
 
@@ -248,9 +267,9 @@ class InMemoryTaskManagerTest {
     public void testTimeConflictForTasksWithNonCrossingTime() {
         Task task1 = new Task("task", "des", "24.10.1991 12:00", 30);
         Task task2 = new Task("task2", "des2", "24.10.1991 13:00", 10);
-        Subtask sub1 = new Subtask("Sub", "sub des", "24.10.1990 12:40", 30);
         Epic epic1 = new Epic("epic", "epic des");
-        epic1.addSubtask(sub1);
+        inMemoryTaskManager.createSubtaskForEpic(epic1, "Sub", "sub des", "24.10.1990 12:40", 30);
+
 
         inMemoryTaskManager.addNewTask(task1);
         inMemoryTaskManager.addNewTask(task2);
@@ -258,7 +277,7 @@ class InMemoryTaskManagerTest {
 
         assertTrue(inMemoryTaskManager.getTaskStore().contains(task1));
         assertTrue(inMemoryTaskManager.getTaskStore().contains(task2));
-        assertTrue(inMemoryTaskManager.getSubtaskStore().contains(sub1));
+        assertTrue(inMemoryTaskManager.getSubtaskStore().contains(epic1.getSubtaskList().getFirst()));
         assertTrue(inMemoryTaskManager.getEpicStore().contains(epic1));
     }
 
@@ -286,9 +305,8 @@ class InMemoryTaskManagerTest {
     public void testTimeConflictCheckForTasksWithoutTime() {
         Task task1 = new Task("Task 1", "Description");
         Task task2 = new Task("Task 2", "Description");
-        Subtask sub1 = new Subtask("Sub", "sub des");
         Epic epic1 = new Epic("epic", "epic des");
-        epic1.addSubtask(sub1);
+        inMemoryTaskManager.createSubtaskForEpic(epic1, "Sub", "sub des", "24.10.1990 12:40", 30);
 
         inMemoryTaskManager.addNewTask(task1);
         inMemoryTaskManager.addNewTask(task2);
@@ -297,8 +315,62 @@ class InMemoryTaskManagerTest {
 
         assertTrue(inMemoryTaskManager.getTaskStore().contains(task1));
         assertTrue(inMemoryTaskManager.getTaskStore().contains(task2));
-        assertTrue(inMemoryTaskManager.getSubtaskStore().contains(sub1));
+        assertTrue(inMemoryTaskManager.getSubtaskStore().contains(epic1.getSubtaskList().getFirst()));
         assertTrue(inMemoryTaskManager.getEpicStore().contains(epic1));
+
+    }
+
+    @Test
+    public void shellReturnSortedPrioritySetByDates() {
+        Task task1 = new Task("Task 1", "Description", "24.10.1991 11:00", 60);
+        Task task2 = new Task("Task 2", "Description", "20.10.1991 12:00", 120);
+        Epic epic1 = new Epic("epic", "epic des");
+
+        inMemoryTaskManager.addNewTask(task1);
+        inMemoryTaskManager.addNewTask(task2);
+
+        try {
+            inMemoryTaskManager.createSubtaskForEpic(epic1, "Sub", "sub des", "24.10.1989 12:40", 30);
+        } catch (TimeConflictException e) {
+
+        }
+
+        inMemoryTaskManager.addNewSubtasks(epic1.getSubtaskList());
+        inMemoryTaskManager.addNewEpic(epic1);
+
+        ArrayList<AbstractTask> control = new ArrayList<>();
+        if (!epic1.getSubtaskList().isEmpty()) {
+            control.add(epic1.getSubtaskList().getFirst());
+        }
+
+        control.add(task2);
+        control.add(task1);
+        assertIterableEquals(inMemoryTaskManager.getPrioritizedTasks(), control);
+        control.clear();
+
+        try {
+            inMemoryTaskManager.updateTask(5, "Tasw", "Description", Status.NEW, "25.10.1991 15:00", 15);
+        } catch (TimeConflictException e) {
+
+        }
+        if (!epic1.getSubtaskList().isEmpty()) {
+            control.add(epic1.getSubtaskList().getFirst());
+        }
+        control.add(task1);
+        control.add(task2);
+        assertIterableEquals(inMemoryTaskManager.getPrioritizedTasks(), control);
+        control.clear();
+
+        inMemoryTaskManager.clearTaskStore();
+        if (!epic1.getSubtaskList().isEmpty()) {
+            control.add(epic1.getSubtaskList().getFirst());
+        }
+        assertIterableEquals(inMemoryTaskManager.getPrioritizedTasks(), control);
+        control.clear();
+
+        inMemoryTaskManager.clearEpicStore();
+
+        assertEquals(0, inMemoryTaskManager.getPrioritizedTasks().size());
 
     }
 

@@ -5,6 +5,7 @@ import models.*;
 import exceptions.TimeConflictException;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Stream;
@@ -14,9 +15,12 @@ public class InMemoryTaskManager<T extends AbstractTask> implements TaskManager 
     private final Map<Integer, Epic> epicStore = new HashMap();
     private final Map<Integer, Task> taskStore = new HashMap<>();
     private final Map<Integer, Subtask> subtaskStore = new HashMap<>();
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+    protected final Set<AbstractTask> prioritizedTasks = new TreeSet<>(Comparator.comparing(AbstractTask::getStartTimeInFormat));
 
     //Методы для каждого из типа задач(Задача/Эпик/Подзадача):
     // a. Получение списка всех задач.
+
 
     @Override
     public ArrayList<Epic> getEpicStore() {
@@ -36,6 +40,13 @@ public class InMemoryTaskManager<T extends AbstractTask> implements TaskManager 
     // b. Удаление всех задач.
     @Override
     public void clearEpicStore() {
+        epicStore.values().stream()
+                .forEach(epic -> {
+                    epic.getSubtaskList().stream()
+                            .filter(subtask -> subtask.getStartTime() != null)
+                            .forEach(prioritizedTasks::remove);
+                });
+
         epicStore.keySet().forEach(historyManager::remove);
         epicStore.clear();
         subtaskStore.keySet().forEach(historyManager::remove);
@@ -44,12 +55,19 @@ public class InMemoryTaskManager<T extends AbstractTask> implements TaskManager 
 
     @Override
     public void clearTaskStore() {
+        taskStore.values().stream()
+                .filter(task -> task.getStartTime() != null)
+                .forEach(prioritizedTasks::remove);
+
         taskStore.keySet().forEach(historyManager::remove);
         taskStore.clear();
     }
 
     @Override
     public void clearSubtaskStore() {
+        subtaskStore.values().stream()
+                .filter(subtask -> subtask.getStartTime() != null)
+                .forEach(prioritizedTasks::remove);
 
         epicStore.values().forEach(Epic::clearSubtasks);
         subtaskStore.keySet().forEach(historyManager::remove);
@@ -88,20 +106,29 @@ public class InMemoryTaskManager<T extends AbstractTask> implements TaskManager 
     // d. Создание. Сам объект должен передаваться в качестве параметра.
     @Override
     public void addNewEpic(Epic epic) {
-        try {
-            if (timeConflictCheck(epic)) {
-                throw new TimeConflictException("Эпик c id " + epic.getId() + " не была добавлена - пересекается во времени с существующими");
-            }
-
-            if (epic.getSubtaskList().size() == 0) {
-                this.epicStore.put(epic.getId(), epic);
-            } else if (epic.getSubtaskList().size() > 0) {
-                epic.getSubtaskList().forEach(this::addNewSubtask);
-                this.epicStore.put(epic.getId(), epic);
-            }
-        } catch (TimeConflictException e) {
-            System.out.println(e.getMessage());
-        }
+        //При добавлении эпика, содержащего подзадачи, я также добавляю и его подзадачи и проверяю их на временном отрезке
+        //в том смысле, что если эпик уже содержет подзадачи, перед добавлением.
+        //просто если пользлваться только методом таскменеджера, то этот мeтод будет прост,
+        //а каждую задачу придется добавлять дополнительным методом.
+        if (epic != null)
+            this.epicStore.put(epic.getId(), epic);
+//        try {
+//            if (timeConflictCheck(epic)) {
+//                throw new TimeConflictException("Эпик c id " + epic.getId() + " не была добавлена - пересекается во времени с существующими");
+//            }
+//
+//            if (epic.getSubtaskList().size() == 0) {
+//                this.epicStore.put(epic.getId(), epic);
+//            } else if (epic.getSubtaskList().size() > 0) {
+//                epic.getSubtaskList().forEach(subtask -> subtaskStore.put(subtask.getId(), subtask));
+//                epic.getSubtaskList().stream()
+//                        .filter(task -> task.getStartTime() != null)
+//                        .forEach(prioritizedTasks::add);
+//                this.epicStore.put(epic.getId(), epic);
+//            }
+//        } catch (TimeConflictException e) {
+//            System.out.println(e.getMessage());
+//        }
     }
 
     @Override
@@ -109,6 +136,9 @@ public class InMemoryTaskManager<T extends AbstractTask> implements TaskManager 
         try {
             if (timeConflictCheck(task)) {
                 throw new TimeConflictException("Задача c id " + task.getId() + " не была добавлена - пересекается во времени с существующими");
+            }
+            if (task.getStartTime() != null) {
+                this.prioritizedTasks.add(task);
             }
             this.taskStore.put(task.getId(), task);
         } catch (TimeConflictException e) {
@@ -122,6 +152,9 @@ public class InMemoryTaskManager<T extends AbstractTask> implements TaskManager 
             if (timeConflictCheck(subtask))
                 throw new TimeConflictException("Подзадача " + subtask.getId() + "не была добавлена - пересекается во времени с существующими");
             this.subtaskStore.put(subtask.getId(), subtask);
+            if (subtask.getStartTime() != null) {
+                this.prioritizedTasks.add(subtask);
+            }
         } catch (TimeConflictException e) {
             System.out.println(e.getMessage());
         }
@@ -129,16 +162,42 @@ public class InMemoryTaskManager<T extends AbstractTask> implements TaskManager 
 
     @Override
     public void addNewSubtasks(List<Subtask> subtaskList) {
-        try {
-            subtaskList.forEach(subtask -> {
-                if (timeConflictCheck(subtask))
-                    throw new TimeConflictException("Подзадача " + subtask.getId() + "не была добавлена - пересекается во времени с существующими");
-                subtaskStore.put(subtask.getId(), subtask);
-            });
+        if (subtaskList == null) return;
 
-        } catch (TimeConflictException e) {
-            System.out.println(e.getMessage());
+        subtaskList.forEach(subtask -> {
+            try {
+                if (timeConflictCheck(subtask)) {
+                    throw new TimeConflictException("Подзадача " + subtask.getId() + " не была добавлена - пересекается во времени с существующими");
+                }
+                subtaskStore.put(subtask.getId(), subtask);
+                if (subtask.getStartTime() != null) {
+                    this.prioritizedTasks.add(subtask);
+                }
+            } catch (TimeConflictException e) {
+                System.out.println(e.getMessage());
+            }
+        });
+    }
+
+    //Добавил метод, чтобы е=при TimeConflict сабтаск не добавлялся в эпик
+    public Subtask createSubtaskForEpic(Epic epic, String name, String description, String startTime, int duration) {
+        Subtask subtask = new Subtask(name, description, startTime, duration);
+
+        if (timeConflictCheck(subtask)) {
+            throw new TimeConflictException("Подзадача " + subtask.getId() + " не была добавлена - пересекается во времени с существующими");
         }
+        subtask.setEpicID(epic.getId());
+        epic.addSubtask(subtask);
+        subtaskStore.put(subtask.getId(), subtask);
+        return subtask;
+    }
+
+    public Subtask createSubtaskForEpic(Epic epic, String name, String description) {
+        Subtask subtask = new Subtask(name, description);
+        subtask.setEpicID(epic.getId());
+        epic.addSubtask(subtask);
+        subtaskStore.put(subtask.getId(), subtask);
+        return subtask;
     }
 
     // e. Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
@@ -163,9 +222,11 @@ public class InMemoryTaskManager<T extends AbstractTask> implements TaskManager 
                 System.out.println("Задачи с " + id + " не существует");
                 return;
             }
+            if (taskToChange.getStartTime() != null) {
+                prioritizedTasks.remove(taskToChange);
+            }
 
             Task tempTask = new Task(id, name, description, status, startTime, duration);
-
             if (timeConflictCheck(tempTask)) {
                 throw new TimeConflictException("Задача " + id + "не была добавлена - пересекается во времени с существующими");
             }
@@ -175,17 +236,11 @@ public class InMemoryTaskManager<T extends AbstractTask> implements TaskManager 
             taskToChange.setStatus(status);
             taskToChange.setStartTime(startTime);
             taskToChange.setDuration(duration);
-//
-//            if (timeConflictCheck(taskToChange))
-//                throw new TimeConflictException("Задача " + id + "не была добавлена - пересекается во времени с существующими");
-//            else {
-//                taskToChange.setName(name);
-//                taskToChange.setDescription(description);
-//                taskToChange.setStatus(status);
-//                taskToChange.setStartTime(startTime);
-//                taskToChange.setDuration(duration);
-//            }
-//
+
+            if (taskToChange.getStartTime() != null) {
+                prioritizedTasks.add(taskToChange);
+            }
+
         } catch (TimeConflictException e) {
             System.out.println(e.getMessage());
         } catch (NullPointerException e) {
@@ -199,13 +254,24 @@ public class InMemoryTaskManager<T extends AbstractTask> implements TaskManager 
     public void updateSubtask(int id, String name, String description, Status status, String startTime, int duration) {
         try {
             Subtask subtaskToChange = subtaskStore.get(id);
+            if (subtaskToChange == null) {
+                System.out.println("Задачи с " + id + " не существует");
+                return;
+            }
+            prioritizedTasks.remove(subtaskToChange);
+
+            Subtask tempSubTask = new Subtask(id, name, description, status, startTime, duration, subtaskToChange.getEpicID());
+            if (timeConflictCheck(tempSubTask)) {
+                throw new TimeConflictException("Подзадача с id " + id + " не была добавлена - пересекается во времени с существующими");
+            }
+
             subtaskToChange.setName(name);
             subtaskToChange.setDescription(description);
             subtaskToChange.setStatus(status);
             subtaskToChange.setStartTime(startTime);
             subtaskToChange.setDuration(duration);
-            if (timeConflictCheck(subtaskToChange))
-                throw new TimeConflictException("Подзадача " + id + "не была добавлена - пересекается во времени с существующими");
+            prioritizedTasks.add(subtaskToChange);
+
         } catch (TimeConflictException e) {
             System.out.println(e.getMessage());
         } catch (NullPointerException e) {
@@ -217,44 +283,49 @@ public class InMemoryTaskManager<T extends AbstractTask> implements TaskManager 
     // f. Удаление по идентификатору.
     @Override
     public void deleteEpicByID(int id) {
-        List<Subtask> subtasksForDelete = new ArrayList<>();
-        for (Subtask subtask : subtaskStore.values()) {
-            if (subtask.getEpicID() == id) {
-                subtasksForDelete.add(subtask);
-            }
-        }
+        Optional.ofNullable(epicStore.get(id)).
+                ifPresentOrElse(epic -> {
+                    List<Subtask> subsToDelete = subtaskStore.values().stream()
+                            .filter(subtask -> subtask.getEpicID() == id)
+                            .toList();
 
-        for (Subtask subtask : subtasksForDelete) {
-            subtaskStore.remove(subtask.getId());
-            historyManager.remove(subtask.getId());
-        }
-        //Хотел написать так, но тут придеться два раза пройтись по коллекциям... Не уверен, что будет эффективнее исходника
-//        subtaskStore.values().stream()
-//                .filter(subtask -> subtask.getEpicID() == id)
-//                .map(subtask -> subtask.getId())
-//                .forEach(historyManager::remove);
-//        subtaskStore.values().removeIf(subtask -> subtask.getEpicID() == id);
+                    subsToDelete.stream()
+                            .filter(subtask -> subtask.getStartTime() != null)
+                            .forEach(prioritizedTasks::remove);
 
+                    subsToDelete.stream()
+                            .forEach(subtask -> {
+                                historyManager.remove(subtask.getId());
+                                subtaskStore.remove(subtask.getId());
+                            });
+                    epicStore.remove(id);
+                    historyManager.remove(id);
 
-        epicStore.remove(id);
-        historyManager.remove(id);
+                }, () -> System.out.println("Эпик с id " + id + " не найден."));
+
     }
 
     @Override
     public void deleteTaskByID(int id) {
-        taskStore.remove(id);
-        historyManager.remove(id);
+        Optional.ofNullable(taskStore.get(id))
+                .ifPresentOrElse(task -> {
+                    prioritizedTasks.remove(task);
+                    taskStore.remove(id);
+                    historyManager.remove(id);
+                }, () -> System.out.println("Задачи с id " + id + " не найдено."));
     }
 
     @Override
     public void deleteSubtaskByID(int id) {
         Optional.ofNullable(subtaskStore.get(id))
-                .ifPresent(subtask -> {
+                .ifPresentOrElse(subtask -> {
                     Optional.ofNullable(epicStore.get(subtask.getEpicID()))
-                            .ifPresent(epic -> epic.deleteSubtask(id));
+                            .ifPresentOrElse(epic -> epic.deleteSubtask(id),
+                                    () -> System.out.println("Эпика с id " + subtask.getEpicID() + " не найдено."));
                     subtaskStore.remove(id);
                     historyManager.remove(id);
-                });
+                    prioritizedTasks.remove(subtask);
+                }, () -> System.out.println("Подзадачи с id " + id + " не найдено."));
     }
 
     //Получение списка всех подзадач определённого эпика.
@@ -270,23 +341,8 @@ public class InMemoryTaskManager<T extends AbstractTask> implements TaskManager 
     }
 
 
-    //В задании не понятно, нужно ли помещать суда эпики
-    //Распределение задач по приоретету
-    public Set<AbstractTask> getPrioritizedTasks() {
-        Set<AbstractTask> tasksByPriority = new TreeSet<>(Comparator
-                .comparing(task -> LocalDateTime.parse(task.getStartTime(), task.getFormatter())));
-
-        getTaskStore().stream()
-                .filter(task -> task.getStartTime() != null)
-                //.filter(task -> LocalDateTime.parse(task.getStartTime(), task.getFormatter()) != null)
-                .forEach(tasksByPriority::add);
-
-        getSubtaskStore().stream()
-                .filter(stask -> stask.getStartTime() != null)
-                //.filter(stask -> LocalDateTime.parse(stask.getStartTime(), stask.getFormatter()) != null)
-                .forEach(tasksByPriority::add);
-
-        return tasksByPriority;
+    public List<AbstractTask> getPrioritizedTasks() {
+        return new ArrayList<>(prioritizedTasks);
     }
 
     private boolean isTimeOverlap(AbstractTask task1, AbstractTask task2) {
@@ -318,5 +374,6 @@ public class InMemoryTaskManager<T extends AbstractTask> implements TaskManager 
                 .anyMatch(task -> isTimeOverlap(task, newTask));
 
     }
+
 
 }
