@@ -283,8 +283,8 @@ public class InMemoryTaskManager<T extends AbstractTask> implements TaskManager 
     // f. Удаление по идентификатору.
     @Override
     public void deleteEpicByID(int id) {
-        Optional.ofNullable(epicStore.get(id)).
-                ifPresentOrElse(epic -> {
+        Optional.ofNullable(epicStore.get(id))
+                .ifPresentOrElse(epic -> {
                     List<Subtask> subsToDelete = subtaskStore.values().stream()
                             .filter(subtask -> subtask.getEpicID() == id)
                             .toList();
