@@ -69,11 +69,17 @@ public abstract class AbstractTask {
     }
 
 
-    abstract public String getStartTime();
+    public String getStartTime() {
+        return null;
+    }
 
-    abstract public Duration getDuration();
+    public Duration getDuration() {
+        return null;
+    }
 
-    abstract public String getEndTime();
+    public String getEndTime() {
+        return null;
+    }
 
     public DateTimeFormatter getFormatter() {
         return formatter;
