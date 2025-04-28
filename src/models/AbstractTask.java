@@ -1,5 +1,8 @@
 package models;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public abstract class AbstractTask {
@@ -8,6 +11,11 @@ public abstract class AbstractTask {
     private String name;
     private String description;
     protected Status status;
+    private Duration duration;
+    private LocalDateTime startTime;
+
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+
 
     public AbstractTask(String name, String description) {
         this.name = name;
@@ -64,6 +72,47 @@ public abstract class AbstractTask {
         idCounter = newIdCounter;
     }
 
+
+    public String getStartTime() {
+        return this.startTime != null ? startTime.format(getFormatter()) : null;
+    }
+
+    public LocalDateTime getStartTimeInFormat() {
+        return this.startTime;
+    }
+
+    public Duration getDuration() {
+        return duration != null ? duration : Duration.ZERO;
+    }
+
+
+    public void setDuration(int durationInMin) {
+        this.duration = Duration.ofMinutes(durationInMin);
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime != null ? LocalDateTime.parse(startTime, getFormatter()) : null;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        if (getStartTime() != null) {
+            LocalDateTime endTime = LocalDateTime.parse(getStartTime(), getFormatter()).plusMinutes(getDuration().toMinutes());
+            return endTime.format(getFormatter());
+        } else
+            return null;
+    }
+
+    public DateTimeFormatter getFormatter() {
+        return formatter;
+    }
 
     //Переопределения методов, для сравнения по айди
     @Override

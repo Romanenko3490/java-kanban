@@ -4,6 +4,7 @@ import models.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public interface TaskManager {
     ArrayList<Epic> getEpicStore();
@@ -20,11 +21,11 @@ public interface TaskManager {
     void clearSubtaskStore();
 
     // c. Получение по идентификатору.
-    Epic getEpicByID(int id);
+    Optional<Epic> getEpicByID(int id);
 
-    Task getTaskByID(int id);
+    Optional<Task> getTaskByID(int id);
 
-    Subtask getSubtaskByID(int id);
+    Optional<Subtask> getSubtaskByID(int id);
 
     // d. Создание. Сам объект должен передаваться в качестве параметра.
     void addNewEpic(Epic epic);
@@ -38,9 +39,9 @@ public interface TaskManager {
     // e. Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
     void updateEpic(int id, String name, String description);
 
-    void updateTask(int id, String name, String description, Status status);
+    void updateTask(int id, String name, String description, Status status, String startTime, int duration);
 
-    void updateSubtask(int id, String name, String description, Status status);
+    void updateSubtask(int id, String name, String description, Status status, String startTime, int duration);
 
     // f. Удаление по идентификатору.
     void deleteEpicByID(int id);
@@ -50,7 +51,7 @@ public interface TaskManager {
     void deleteSubtaskByID(int id);
 
     //Получение списка всех подзадач определённого эпика.
-    List<Subtask> getSubtasksFromEpic(int epicID);
+    Optional<List<Subtask>> getSubtasksFromEpic(int epicID);
 
 
 }

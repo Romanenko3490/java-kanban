@@ -1,53 +1,59 @@
 import models.*;
 import controllers.*;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Main {
 
     public static void main(String[] args) {
-        //сохранение
-//        Task task1 = new Task("Task 1", "Description task 1");
-//        Task task2 = new Task("Task 2", "Description task 2");
-//        Epic epic1 = new Epic("epic 1", "decription epic 1");
-//        epic1.createSubtask("subtask 1", "Description subtask 1");
-//        epic1.createSubtask("subtask 2", "description subtask 2");
-//        epic1.createSubtask("subtask 3", "desceiption subtask 3");
-//        Epic epic2 = new Epic("Epic 2", "Description Epic 2");
+//        FileBackedTaskManager manager = new FileBackedTaskManager(Paths.get("src//resources//save.csv"));
+//        Task taskId1 = new Task("tast1", "Des1", "24.10.1991 12:00", 30);
+//        Task taskId2 = new Task("task2", "des");
 //
-//        Path path = Paths.get("src//resources//save.csv");
-//        FileBackedTaskManager fm = new FileBackedTaskManager(path);
-//        fm.addNewTask(task1);
-//        fm.addNewTask(task2);
-//        fm.addNewEpic(epic1);
-//        fm.addNewSubtasks(epic1.getSubtaskList());
+//        Epic epicId3 = new Epic("epic1", "des");
+//        manager.createSubtaskForEpic(epicId3, "subId4", "des", "24.10.1991 12:00", 10);
+//        manager.createSubtaskForEpic(epicId3,"subId5", "des");
 //
-//        fm.addNewEpic(epic2);
-//        fm.deleteEpicByID(7);
-//        fm.deleteTaskByID(2);
+//        Epic epicId6 = new Epic("epic2", "des");
+//        manager.createSubtaskForEpic(epicId6,"subID7", "des", "24.10.1990 13:00", 120);
+//        manager.createSubtaskForEpic(epicId6,"subtId8", "des", "24.10.1991 15:00", 60);
+//
+//        manager.addNewTask(taskId1);
+//        manager.addNewTask(taskId2);
+//        manager.addNewEpic(epicId3);
+//        manager.addNewSubtasks(epicId3.getSubtaskList());
+//        manager.addNewEpic(epicId6);
+//        manager.addNewSubtasks(epicId6.getSubtaskList());
+//       // System.out.println(manager.getPrioritizedTasks());
+//
+//        manager.updateTask(2, "task2", "desc2", Status.NEW, "24.10.2005 12:00", 30);
+//        System.out.println();
+//        //System.out.println(manager.getPrioritizedTasks());
+//
+//        System.out.println();
+//        //System.out.println(manager.getPrioritizedTasks());
+//        //manager.clearTaskStore();
+//        //System.out.println(manager.getPrioritizedTasks());
+//        //System.out.println(manager.getEpicStore());
+//        manager.deleteEpicByID(3);
+//        System.out.println(manager.getEpicStore());
+//        System.out.println();
+//        System.out.println(manager.getSubtaskStore());
 
-        // загрузка
-        Path path = Paths.get("src//resources//save.csv");
-        FileBackedTaskManager fm = FileBackedTaskManager.loadFromFile(path);
 
-        System.out.println(fm.getTaskStore());
+
+
+
+        FileBackedTaskManager manager = FileBackedTaskManager.loadFromFile(Paths.get("src//resources//save.csv"));
+
+        System.out.println("субтаск");
+        System.out.println(manager.getSubtaskStore());
         System.out.println();
-        System.out.println(fm.getEpicStore());
+        System.out.println("task");
+        System.out.println(manager.getTaskStore());
         System.out.println();
-        System.out.println(fm.getSubtaskStore());
-
-        Task task = new Task("task new", "des new");
-        fm.addNewTask(task);
-        //System.out.println(fm.getTaskStore());
-
-        Epic epic = new Epic("epic new", "dwe");
-        fm.addNewEpic(epic);
-        System.out.println();
-        System.out.println(fm.getTaskStore());
-        System.out.println();
-        System.out.println(fm.getEpicStore());
-
+        System.out.println("epic");
+        System.out.println(manager.getEpicStore());
 
     }
 

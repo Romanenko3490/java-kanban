@@ -1,7 +1,6 @@
 package controllers;
 
 import models.AbstractTask;
-
 import java.util.ArrayList;
 
 public interface HistoryManager<T extends AbstractTask> {
@@ -13,4 +12,5 @@ public interface HistoryManager<T extends AbstractTask> {
     void addToHistory(AbstractTask task);
 
     void remove(int id);
+
 }

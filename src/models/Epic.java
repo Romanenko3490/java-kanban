@@ -1,19 +1,25 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class Epic extends AbstractTask {
     private final List<Subtask> subtaskList = new ArrayList<>();
+    private LocalDateTime endTime;
+
 
     public Epic(String name, String description) {
         super(name, description);
     }
 
-    public Epic(Integer id, String name, String description, Status status) {
+    public Epic(Integer id, String name, String description, Status status, String startTime, int durationInMin) {
         super(name, description);
         this.status = status;
         setId(id);
+        setDuration(durationInMin);
+        setStartTime(startTime);
+
     }
 
     private void setStatus() {
@@ -40,6 +46,62 @@ public class Epic extends AbstractTask {
         return status;
     }
 
+
+    @Override
+    public String getStartTime() {
+        if (subtaskList.isEmpty()) {
+            setStartTime((String) null);
+            return null;
+        } else {
+            Optional<LocalDateTime> erliestSubTime = subtaskList.stream()
+                    .map(Subtask::getStartTime)
+                    .filter(Objects::nonNull)
+                    .map(time -> LocalDateTime.parse(time, getFormatter()))
+                    .min(LocalDateTime::compareTo);
+
+            if (erliestSubTime.isPresent()) {
+                setStartTime(erliestSubTime.get());
+                return erliestSubTime.get().format(getFormatter());
+            } else
+                return null;
+        }
+    }
+
+    @Override
+    public Duration getDuration() {
+        setDuration(Duration.ZERO);
+        if (subtaskList.isEmpty()) {
+            return Duration.ZERO;
+        } else {
+            Duration temp = Duration.ZERO;
+            for (Subtask subtask : subtaskList) {
+                if (subtask.getDuration() != null) {
+                    temp = temp.plus(subtask.getDuration());
+                }
+            }
+            setDuration(temp);
+            return temp;
+        }
+    }
+
+    @Override
+    public String getEndTime() {
+        if (subtaskList.isEmpty()) {
+            return null;
+        } else {
+            Optional<LocalDateTime> latestSubTime = subtaskList.stream()
+                    .map(Subtask::getEndTime)
+                    .filter(Objects::nonNull)
+                    .map(time -> LocalDateTime.parse(time, getFormatter()))
+                    .max(LocalDateTime::compareTo);
+            if (latestSubTime.isPresent()) {
+                endTime = latestSubTime.get();
+                return endTime.format(getFormatter());
+            }
+        }
+        return null;
+    }
+
     public void addSubtask(Subtask subtask) {
         subtaskList.add(subtask);
         subtask.setEpicID(getId());
@@ -49,14 +111,20 @@ public class Epic extends AbstractTask {
         return subtaskList;
     }
 
-    public void createSubtask(String name, String description) {
-        Subtask subtask = new Subtask(name, description);
+    public void createSubtask(String name, String description, String startTime, int durationInMin) {
+        Subtask subtask = new Subtask(name, description, startTime, durationInMin);
         subtaskList.add(subtask);
         subtask.setEpicID(getId());
     }
 
-    public void createSubtask(String name, String description, Status status) {
-        Subtask subtask = new Subtask(name, description, status);
+    public void createSubtask(String name, String description, Status status, String startTime, int durationInMin) {
+        Subtask subtask = new Subtask(name, description, status, startTime, durationInMin);
+        subtaskList.add(subtask);
+        subtask.setEpicID(getId());
+    }
+
+    public void createSubtask(String name, String description) {
+        Subtask subtask = new Subtask(name, description);
         subtaskList.add(subtask);
         subtask.setEpicID(getId());
     }
@@ -78,13 +146,14 @@ public class Epic extends AbstractTask {
 
     public String stringForSerialize() {
         return getId() + "," + Types.EPIC + "," + getName() + "," +
-                getStatus() + "," + getDescription() + ",}";
+                getStatus() + "," + getDescription() + "," + getStartTime() + "," + getDuration().toMinutes() + ",}";
     }
 
     @Override
     public String toString() {
         return "Epic{ ID='" + getId() + "', name='" + getName() + "', description='" + getDescription() +
-                "', status='" + getStatus() + "', contains subtasks:\n" + getSubtaskList();
+                "', status='" + getStatus() + "' ST= " + getStartTime() + "' Dur='" + getDuration().toMinutes() + "min' ET=" +
+                getEndTime() + "', contains subtasks:\n" + getSubtaskList();
     }
 
 
