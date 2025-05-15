@@ -15,11 +15,9 @@ import java.util.stream.Collectors;
 
 public class TaskHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager taskManager;
-    private final Gson gson;
 
     public TaskHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
-        this.gson = new Gson();
     }
 
     @Override
@@ -40,7 +38,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
                     handleDelete(exchange, pathParts);
                     break;
                 default:
-                    sendNotFound(exchange);
+                    sendBadRequest(exchange);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -70,7 +68,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
                 sendText(exchange, "Неверный формат id задачи", 400);
             }
         } else {
-            sendNotFound(exchange);
+            sendBadRequest(exchange);
         }
     }
 

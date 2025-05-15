@@ -9,7 +9,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 public class BaseHttpHandler {
-    Gson gson = new Gson();
+    protected Gson gson = new Gson();
 
     protected void sendText(HttpExchange exchange, String text, int statusCode) throws IOException {
         byte[] resp = text.getBytes(StandardCharsets.UTF_8);
@@ -24,6 +24,11 @@ public class BaseHttpHandler {
     protected void sendNotFound(HttpExchange exchange) throws IOException {
         String resp = "Ресурс не найден";
         sendText(exchange, resp, 404);
+    }
+
+    protected void sendBadRequest(HttpExchange exchange) throws IOException {
+        String resp = "BAD REQUEST";
+        sendText(exchange, resp, 400);
     }
 
     protected void sendHasInteractions(HttpExchange exchange) throws IOException {

@@ -1,6 +1,5 @@
 package api;
 
-import com.google.gson.*;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import controllers.TaskManager;
@@ -13,11 +12,9 @@ import java.util.stream.Collectors;
 
 public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager taskManager;
-    private final Gson gson;
 
     public HistoryHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
-        this.gson = new Gson();
     }
 
     @Override
@@ -26,7 +23,7 @@ public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
             if ("GET".equals(exchange.getRequestMethod())) {
                 handleGet(exchange);
             } else {
-                sendNotFound(exchange);
+                sendBadRequest(exchange);
             }
         } catch (Exception e) {
             e.printStackTrace();
