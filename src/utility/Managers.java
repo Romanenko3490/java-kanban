@@ -9,7 +9,7 @@ public class Managers {
 
     //Да, наверное вы правы, обобщение тут ни к чему, если будет множество разных менеджеров.
 
-    public TaskManager getDefault() {
+    public static TaskManager getDefault() {
         TaskManager manager = new InMemoryTaskManager<>();
         return manager;
     }

@@ -23,6 +23,8 @@ public interface TaskManager {
     // c. Получение по идентификатору.
     Optional<Epic> getEpicByID(int id);
 
+    Optional<Epic> getEpicByIdAvoidHistory(int id);
+
     Optional<Task> getTaskByID(int id);
 
     Optional<Subtask> getSubtaskByID(int id);
@@ -53,5 +55,10 @@ public interface TaskManager {
     //Получение списка всех подзадач определённого эпика.
     Optional<List<Subtask>> getSubtasksFromEpic(int epicID);
 
+    InMemoryHistoryManager getHistoryManager();
+
+    List<AbstractTask> getPrioritizedTasks();
+
+    boolean timeConflictCheck(AbstractTask newTask);
 
 }

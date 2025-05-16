@@ -1,6 +1,7 @@
 package controllers;
 
 import models.AbstractTask;
+
 import java.util.ArrayList;
 
 public interface HistoryManager<T extends AbstractTask> {

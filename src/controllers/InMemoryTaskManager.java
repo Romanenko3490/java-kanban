@@ -85,6 +85,14 @@ public class InMemoryTaskManager<T extends AbstractTask> implements TaskManager 
                 });
     }
 
+    //Пришлось дописать такой метод, так как в СабтаскХендлере при добавлении сабтаска в эпик вызывается метод
+    //getEpicByID() чтобы в него добавить сабтаск, и получается что эпик залетает в историю просмотров.
+    //к сожалению не додумался, как по другому избежать добавления в историю
+    //еще был вариант добавить флажок в метод getEpicByID(int id, boolean addToHistoryOrNot), но решил от него отказаться
+    public Optional<Epic> getEpicByIdAvoidHistory(int id) {
+        return Optional.ofNullable(epicStore.get(id));
+    }
+
     @Override
     public Optional<Task> getTaskByID(int id) {
         return Optional.ofNullable(taskStore.get(id))
@@ -307,25 +315,49 @@ public class InMemoryTaskManager<T extends AbstractTask> implements TaskManager 
 
     @Override
     public void deleteTaskByID(int id) {
-        Optional.ofNullable(taskStore.get(id))
-                .ifPresentOrElse(task -> {
+        Task task = taskStore.get(id);
+        if (task != null) {
+            try {
+
+                if (task.getStartTime() != null) {
                     prioritizedTasks.remove(task);
-                    taskStore.remove(id);
-                    historyManager.remove(id);
-                }, () -> System.out.println("Задачи с id " + id + " не найдено."));
+                }
+                taskStore.remove(id);
+                historyManager.remove(id);
+            } catch (Exception e) {
+                System.err.println("Ошибка удаления task ID " + id + ": " + e.getMessage());
+            }
+        }
     }
 
     @Override
     public void deleteSubtaskByID(int id) {
-        Optional.ofNullable(subtaskStore.get(id))
-                .ifPresentOrElse(subtask -> {
-                    Optional.ofNullable(epicStore.get(subtask.getEpicID()))
-                            .ifPresentOrElse(epic -> epic.deleteSubtask(id),
-                                    () -> System.out.println("Эпика с id " + subtask.getEpicID() + " не найдено."));
-                    subtaskStore.remove(id);
-                    historyManager.remove(id);
-                    prioritizedTasks.remove(subtask);
-                }, () -> System.out.println("Подзадачи с id " + id + " не найдено."));
+        Subtask subtask = subtaskStore.get(id);
+        if (subtask == null) {
+            System.out.println("Подзадачи с id " + id + " не найдено.");
+            return;
+        }
+
+        try {
+            Epic epic = epicStore.get(subtask.getEpicID());
+            if (epic != null) {
+                epic.deleteSubtask(id);
+            } else {
+                System.out.println("Эпика с id " + subtask.getEpicID() + " не найдено.");
+            }
+
+            if (subtask.getStartTime() != null) {
+                prioritizedTasks.remove(subtask);
+            }
+
+            subtaskStore.remove(id);
+            if (historyManager != null) {
+                historyManager.remove(id);
+            }
+        } catch (Exception e) {
+            System.err.println("Ошибка при удалении подзадачи " + id + ": " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     //Получение списка всех подзадач определённого эпика.
@@ -364,7 +396,7 @@ public class InMemoryTaskManager<T extends AbstractTask> implements TaskManager 
         }
     }
 
-    private boolean timeConflictCheck(AbstractTask newTask) {
+    public boolean timeConflictCheck(AbstractTask newTask) {
         if (newTask.getStartTime() == null || newTask.getDuration() == null)
             return false;
 
